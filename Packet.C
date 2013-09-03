@@ -28,15 +28,32 @@ Packet::Packet(PacketCnt *pcnt){
 	
 	l2_header_size = sizeof(struct ether_header);
 	l3_header = packet + sizeof(struct ether_header); //IP header
-	ip_header = (struct ip *)l3_header;
-	src_ip = ip_header->ip_src;
-	dst_ip = ip_header->ip_dst;
-	protocol = ip_header->ip_p;
+	unsigned int ip_ver[3];
+	unsigned int ip_v4[] = {0, 1, 0, 0};
+	unsigned int ip_v6[] = {0, 1, 1, 0};
+	memcpy(ip_ver, packet + sizeof(struct ether_header), 4);
+	if(memcmp(ip_ver, ip_v4, 4)){
+		ip_header = (struct ip *)l3_header;
+		src_ip = ip_header->ip_src;
+		dst_ip = ip_header->ip_dst;
+		protocol = ip_header->ip_p;
 
-	l3_header_size = ip_header->ip_hl*4;
+		l3_header_size = ip_header->ip_hl*4;
 
-	l4_header = l3_header + ip_header->ip_hl*4; //TCP/UDP header
-	packet_size = static_cast<unsigned int>(ntohs(ip_header->ip_len)) + l2_header_size;
+		l4_header = l3_header + ip_header->ip_hl*4; //TCP/UDP header
+		packet_size = static_cast<unsigned int>(ntohs(ip_header->ip_len)) + l2_header_size;
+	}else if(memcmp(ip_ver, ip_v6, 4)){
+		ip_v6_header = (IpV6 *)l3_header;
+		ip_v6_src_ip = ip_v6_header->ip_v6_src;
+		ip_v6_dst_ip = ip_v6_header->ip_v6_dst;
+		protocol = ip_v6_header->next_header;
+		
+		l3_header_size = 320;
+
+		l4_header = l3_header + 320;
+	}
+
+
 
 	if(protocol == IPPROTO_TCP){
 		PACKET_DEBUG(RED cout << "TCP Packet!" << endl ;RESET);

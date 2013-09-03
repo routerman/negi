@@ -25,8 +25,17 @@ typedef struct PacketCnt_t{
 	struct pcap_pkthdr pcap_hdr;
 	u_char pcap_pkt[];
 }PacketCnt;
-	
 
+typedef struct IpV6_t{
+    unsigned int version : 4;
+    unsigned int traffic_class : 8;
+    unsigned int flow_label : 20;
+    uint16_t length;
+    uint8_t  next_header;
+    uint8_t  hop_limit;
+    struct in6_addr ip_v6_src;
+    struct in6_addr ip_v6_dst;
+}IpV6;
 
 class Packet
 {
@@ -34,10 +43,13 @@ class Packet
 		PacketCnt *packet_cnt;			// pointer to libpcap packet structure(w/ header) 
 		Stream *stream;					// pointer to stream that packet belong to
 		unsigned char* packet;			// ponter to packet binary
-		struct ip* ip_header;			// pointer to IP header structure
+		struct ip *ip_header;			// pointer to IP header structure
+		IpV6 *ip_v6_header;			// pointer to IPV6 header structure
 		struct tcphdr* tcp_header;		// pointer to TCP header structure 
+		unsigned int version;
 		unsigned int l2_header_size;	// L2(MAC) header size
 		unsigned int l3_header_size;	// L3(IP) header size
+		unsigned int ip_v6_l3_header_size;	// IPV6L3(IP) header size
 		unsigned int l4_header_size;	// L4(TCP/UDP) header size
 		unsigned int packet_size;		// packet size (caliculated from IP header) <- nomally use this!
 		unsigned int packet_size_cap;	// captured packet size(returned by libpcap)
@@ -62,6 +74,8 @@ class Packet
 
 		struct in_addr src_ip;			// Source IP
 		struct in_addr dst_ip;			// Destination IP
+		struct in6_addr ip_v6_src_ip;	// Source IPV6
+		struct in6_addr ip_v6_dst_ip;	// Destination IPV6
 		unsigned int src_port;			// Source Port
 		unsigned int dst_port;			// Destination Port
 
