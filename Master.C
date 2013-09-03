@@ -33,7 +33,7 @@ void Master::Proc(Packet *pkt){
 //	cout << pkt_cnt << endl;
 //	pkt->Show();
 	MASTER_DEBUG(MSG("Master Proc!"));
-	stream_rebuild->Proc(pkt);
+//	stream_rebuild->Proc(pkt);
 
 	if(pkt->GetError() == 0){
 		//ip_filter.Proc(pkt);

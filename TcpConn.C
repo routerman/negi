@@ -23,6 +23,7 @@ TcpConn::TcpConn(unsigned int port_map_key, Packet * pkt){
 	src_port = pkt->GetSrcPort();
 	dst_ip = pkt->GetDstIP();
 	dst_port = pkt->GetDstPort();
+	version = pkt->GetVersion();
 
 	prev_direction = NEW;
 	destructing_flag = 0;

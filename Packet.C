@@ -28,12 +28,9 @@ Packet::Packet(PacketCnt *pcnt){
 	
 	l2_header_size = sizeof(struct ether_header);
 	l3_header = packet + sizeof(struct ether_header); //IP header
-	unsigned int ip_ver[3];
-	unsigned int ip_v4[] = {0, 1, 0, 0};
-	unsigned int ip_v6[] = {0, 1, 1, 0};
-	memcpy(ip_ver, packet + sizeof(struct ether_header), 4);
-	if(memcmp(ip_ver, ip_v4, 4)){
-		ip_header = (struct ip *)l3_header;
+	ip_header = (struct ip *)l3_header;
+	if(ip_header->ip_v == 0x04){
+		version = 4;
 		src_ip = ip_header->ip_src;
 		dst_ip = ip_header->ip_dst;
 		protocol = ip_header->ip_p;
@@ -42,15 +39,22 @@ Packet::Packet(PacketCnt *pcnt){
 
 		l4_header = l3_header + ip_header->ip_hl*4; //TCP/UDP header
 		packet_size = static_cast<unsigned int>(ntohs(ip_header->ip_len)) + l2_header_size;
-	}else if(memcmp(ip_ver, ip_v6, 4)){
-		ip_v6_header = (IpV6 *)l3_header;
-		ip_v6_src_ip = ip_v6_header->ip_v6_src;
-		ip_v6_dst_ip = ip_v6_header->ip_v6_dst;
-		protocol = ip_v6_header->next_header;
+		cout << "version is: " << version << endl;
+	}else if(ip_header->ip_v == 0x06){
+		ip_header= NULL;
+		version = 6;
+		ip_v6_header = (ipv6hdr *)l3_header;
+		ip_v6_src_ip = ip_v6_header->saddr;
+		ip_v6_dst_ip = ip_v6_header->daddr;
+		protocol = ip_v6_header->nexthdr;
 		
 		l3_header_size = 320;
 
 		l4_header = l3_header + 320;
+		packet_size = static_cast<unsigned int>(ntohs(ip_v6_header->payload_len)) + l2_header_size;
+		cout << "version is: " << version << endl;
+	}else{
+		cout << "ERROR: this packet is not IPV4 nor IPV6" << endl;
 	}
 
 
@@ -75,7 +79,8 @@ Packet::Packet(PacketCnt *pcnt){
 		src_port = ntohs(udp_header->source);
 		dst_port = ntohs(udp_header->dest);
 		l4_header_size = ntohs(udp_header->len);
-		content_size = packet_size - ip_header->ip_hl*4 - sizeof(struct udphdr);
+		// ask ishidasan
+		content_size = packet_size -l3_header_size - sizeof(struct udphdr);
 	} else{
 	PACKET_DEBUG(RED	cout << "This is not TCP/UDP packet!!" <<endl; RESET);
 		src_port = 0;

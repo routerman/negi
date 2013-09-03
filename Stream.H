@@ -67,8 +67,10 @@ class Stream
 	private:
 		TcpConn *tcp_conn;						// pointer to tcp connection that stream belong to
 		unsigned int stream_id;					// (temporally used) stream id number
+		unsigned int version;
 		struct timeval timestamp;				// first stream packet reach time.
 		struct in_addr src_ip, dst_ip;			// Source IP, Destination IP
+		struct in6_addr ip_v6_src_ip, ip_v6_dst_ip;			// Source IP, Destination IP
 		u_int src_port,dst_port;				// Source Port, Destination Port
 		Direction direction;					// transport direction(S2C: server->client, C2S: client-> server)
 		unsigned int last_seq_no;				// last reached packet's sequence number(for packet drop detection)

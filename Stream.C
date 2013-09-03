@@ -34,9 +34,15 @@ Stream::Stream(Packet *pkt){
 	stream_id_prev++;
 
 	timestamp = pkt->GetTimestamp();
-	src_ip = pkt->GetSrcIP();
+	version = pkt->GetVersion();
+	if(vesion == 4){
+		src_ip = pkt->GetSrcIP();
+		dst_ip = pkt->GetDstIP();
+	}else if (version == 6){
+		ip_v6_src_ip = pkt->GetSrcIPV6();
+		ip_v6_dst_ip = pkt->GetDstIPV6();
+	}
 	src_port = pkt->GetSrcPort();
-	dst_ip = pkt->GetDstIP();
 	dst_port = pkt->GetDstPort();
 	last_seq_no = pkt->GetSeqNo();
 	packet_list.push_back(pkt);

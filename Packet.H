@@ -26,16 +26,21 @@ typedef struct PacketCnt_t{
 	u_char pcap_pkt[];
 }PacketCnt;
 
-typedef struct IpV6_t{
-    unsigned int version : 4;
-    unsigned int traffic_class : 8;
-    unsigned int flow_label : 20;
-    uint16_t length;
-    uint8_t  next_header;
-    uint8_t  hop_limit;
-    struct in6_addr ip_v6_src;
-    struct in6_addr ip_v6_dst;
-}IpV6;
+// linux/ipv6.h has error
+// redefination is occurred when it use in.h
+struct ipv6hdr {
+	__u8                    version:4,
+						 priority:4;
+	__u8                    flow_lbl[3];
+	__be16                  payload_len;
+	__u8                    nexthdr;
+	__u8                    hop_limit;
+	struct  in6_addr        saddr;
+	struct  in6_addr        daddr;
+};
+
+
+
 
 class Packet
 {
@@ -44,7 +49,7 @@ class Packet
 		Stream *stream;					// pointer to stream that packet belong to
 		unsigned char* packet;			// ponter to packet binary
 		struct ip *ip_header;			// pointer to IP header structure
-		IpV6 *ip_v6_header;			// pointer to IPV6 header structure
+		struct ipv6hdr *ip_v6_header;
 		struct tcphdr* tcp_header;		// pointer to TCP header structure 
 		unsigned int version;
 		unsigned int l2_header_size;	// L2(MAC) header size
@@ -99,8 +104,11 @@ class Packet
 		PacketCnt *GetPacketContainer(){return packet_cnt;}
 		unsigned char *GetL3Header();
 		unsigned char *GetL4Header();
+		unsigned int GetVersion(){return version;}
 		struct in_addr GetSrcIP(){return src_ip;}
 		struct in_addr GetDstIP(){return dst_ip;}
+		struct in6_addr GetSrcIPV6(){return ip_v6_src_ip;}
+		struct in6_addr GetDstIPV6(){return ip_v6_dst_ip;}
 		unsigned int GetSrcPort(){return src_port;}
 		unsigned int GetDstPort(){return dst_port;}
 		unsigned int GetSeqNo(){return seq_no;}
