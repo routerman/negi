@@ -27,7 +27,7 @@
 
 #define USE_POSTGRES
 #define POSTGRES_MODE
-#define FILEWRITE_MODE
+//#define FILEWRITE_MODE
 #define DEBUG
 
 enum Trunc{

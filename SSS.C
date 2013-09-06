@@ -14,7 +14,7 @@
 #include "Global.H"
 #include "SSS.H"
 
-void *thread_sss(void *)
+void thread_sss(void *)
 {
   Packet* pkt;
   int dstport;

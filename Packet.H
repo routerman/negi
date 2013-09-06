@@ -34,7 +34,9 @@ class Packet
 		PacketCnt *packet_cnt;			// pointer to libpcap packet structure(w/ header) 
 		Stream *stream;					// pointer to stream that packet belong to
 		unsigned char* packet;			// ponter to packet binary
-		struct ip* ip_header;			// pointer to IP header structure
+		struct ether_header* eth_header;	// pointer to Ether header structure
+		struct iphdr* ip_header;			// pointer to IP header structure
+		struct ip6_hdr* ip6_header;			// pointer to IP header structure
 		struct tcphdr* tcp_header;		// pointer to TCP header structure 
 		unsigned int l2_header_size;	// L2(MAC) header size
 		unsigned int l3_header_size;	// L3(IP) header size
@@ -44,6 +46,7 @@ class Packet
 		unsigned int packet_size_org;	// original packet size(returned by libpcap)
 		unsigned int content_size;		// payload size
 		unsigned int l7_content_size;	// Layer 7 content size(with HTTP/1.1 decode, etc)
+		unsigned int version;			// Packet IP Version(4 or 6)
 
 		unsigned char* l3_header;		// pointer to L3(MAC) header
 		unsigned char* l4_header;		// pointer to L4(TCP/UDP) header
@@ -52,7 +55,7 @@ class Packet
 
 		struct timeval	timestamp;		// Packet reached timestamp(returnd by libpcap)
 
-		unsigned int protocol;			// Transport Protocol(ex: TCP:6)
+		unsigned int protocol;			// Transport Protocol(ex: TCP:6) (in IPv6: Next Header)
 		bool ack;						// TCP ACK flag
 		bool fin;						// TCP FIN flag
 		bool syn;						// TCP SYN flag
@@ -60,8 +63,12 @@ class Packet
 		bool psh;						// TCP PUSH flag
 		bool rst;						// TCP RESET flag
 
-		struct in_addr src_ip;			// Source IP
-		struct in_addr dst_ip;			// Destination IP
+		struct in6_addr src_ip;			// Source IP(IPv4 included v6 with ::ffff:x.x.x.x)
+		struct in6_addr dst_ip;			// Destination IP
+		
+		char src_ip_str[INET6_ADDRSTRLEN];
+		char dst_ip_str[INET6_ADDRSTRLEN];
+
 		unsigned int src_port;			// Source Port
 		unsigned int dst_port;			// Destination Port
 
@@ -85,8 +92,10 @@ class Packet
 		PacketCnt *GetPacketContainer(){return packet_cnt;}
 		unsigned char *GetL3Header();
 		unsigned char *GetL4Header();
-		struct in_addr GetSrcIP(){return src_ip;}
-		struct in_addr GetDstIP(){return dst_ip;}
+		struct in6_addr GetSrcIP(){return src_ip;}
+		struct in6_addr GetDstIP(){return dst_ip;}
+		char* GetSrcIPStr(){return src_ip_str;}
+		char* GetDstIPStr(){return dst_ip_str;}
 		unsigned int GetSrcPort(){return src_port;}
 		unsigned int GetDstPort(){return dst_port;}
 		unsigned int GetSeqNo(){return seq_no;}

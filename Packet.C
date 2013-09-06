@@ -27,16 +27,67 @@ Packet::Packet(PacketCnt *pcnt){
 	memcpy(packet, packet_cnt->pcap_pkt, packet_size_cap);
 	
 	l2_header_size = sizeof(struct ether_header);
+	eth_header = (struct ether_header *) packet;
+
 	l3_header = packet + sizeof(struct ether_header); //IP header
-	ip_header = (struct ip *)l3_header;
-	src_ip = ip_header->ip_src;
-	dst_ip = ip_header->ip_dst;
-	protocol = ip_header->ip_p;
 
-	l3_header_size = ip_header->ip_hl*4;
+	switch (ntohs(eth_header->ether_type)){
+		case ETH_P_IP:
+			PACKET_DEBUG(RED cout << "IPv4!" << endl ;RESET);
+			version = 4;
+			ip_header = (struct iphdr *)l3_header;
+			inet_v4tov6((struct in_addr *)(&(ip_header->saddr)), &src_ip);
+			inet_v4tov6((struct in_addr *)(&(ip_header->daddr)), &dst_ip);
+			protocol = ip_header->protocol;
 
-	l4_header = l3_header + ip_header->ip_hl*4; //TCP/UDP header
-	packet_size = static_cast<unsigned int>(ntohs(ip_header->ip_len)) + l2_header_size;
+			l3_header_size = ip_header->ihl*4;
+
+			l4_header = l3_header + ip_header->ihl*4; //TCP/UDP header
+			packet_size = static_cast<unsigned int>(ntohs(ip_header->tot_len)) + l2_header_size;
+
+			struct in_addr v4_src_ip ,v4_dst_ip;
+			inet_v6tov4(&src_ip , &v4_src_ip);
+			inet_v6tov4(&dst_ip , &v4_dst_ip);
+
+			inet_ntop(AF_INET, &v4_src_ip, src_ip_str, INET6_ADDRSTRLEN);
+			inet_ntop(AF_INET, &v4_dst_ip, dst_ip_str, INET6_ADDRSTRLEN);
+
+			ip6_header = NULL;
+
+			break;
+
+///*
+		case ETH_P_IPV6:
+			PACKET_DEBUG(RED cout << "IPv6!" << endl ;RESET);
+			version = 6;
+			ip6_header = (struct ip6_hdr *)l3_header;
+			src_ip = ip6_header->ip6_src;
+			dst_ip = ip6_header->ip6_dst;
+			protocol = ip6_header->ip6_ctlun.ip6_un1.ip6_un1_nxt;
+
+			l3_header_size = 40;	//FIXED Size. no follow about extension header.
+
+			l4_header = l3_header + 40; //TCP/UDP header
+			packet_size = static_cast<unsigned int>(ntohs(ip6_header->ip6_ctlun.ip6_un1.ip6_un1_plen)) + l2_header_size + l3_header_size;	//in IPv6, IP Header size is not included in payload length(ip6_un1_plen).
+
+			inet_ntop(AF_INET6, &src_ip, src_ip_str, INET6_ADDRSTRLEN);
+			inet_ntop(AF_INET6, &dst_ip, dst_ip_str, INET6_ADDRSTRLEN);
+
+			ip_header = NULL;
+
+			break;
+//*/
+
+		default:
+			PACKET_DEBUG(RED    cout << "This is not IPv4 or IPv6 packet!!" <<endl; RESET);
+			src_port = 0;
+			dst_port = 0;
+			content_size = 0;
+			return;
+
+			break;
+	}
+
 
 	if(protocol == IPPROTO_TCP){
 		PACKET_DEBUG(RED cout << "TCP Packet!" << endl ;RESET);
@@ -58,7 +109,7 @@ Packet::Packet(PacketCnt *pcnt){
 		src_port = ntohs(udp_header->source);
 		dst_port = ntohs(udp_header->dest);
 		l4_header_size = ntohs(udp_header->len);
-		content_size = packet_size - ip_header->ip_hl*4 - sizeof(struct udphdr);
+		content_size = packet_size - l3_header_size - sizeof(struct udphdr);
 	} else{
 	PACKET_DEBUG(RED	cout << "This is not TCP/UDP packet!!" <<endl; RESET);
 		src_port = 0;
@@ -182,9 +233,6 @@ struct timeval Packet::GetTimestamp(){
 
 
 void Packet::Show(){
-	string src_ip_str, dst_ip_str;
-	src_ip_str = inet_ntoa(src_ip);
-	dst_ip_str = inet_ntoa(dst_ip);
 	
 	YELLOW
 	cout << "PACKET------------------------------------" <<endl;
