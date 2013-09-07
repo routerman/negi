@@ -80,9 +80,11 @@ Packet::Packet(PacketCnt *pcnt){
 
 		default:
 			PACKET_DEBUG(RED    cout << "This is not IPv4 or IPv6 packet!!" <<endl; RESET);
+			version = 0;
 			src_port = 0;
 			dst_port = 0;
 			content_size = 0;
+			error = 1;
 			return;
 
 			break;
@@ -244,9 +246,9 @@ void Packet::Show(){
 	cout << "[HDR " << packet_size <<"] " << endl;
 
 	cout << "Packet ";
-	cout << "[L2 Header: " << l2_header_size << "] ";
-	cout << "[L3 Header: " << l3_header_size << "] ";
-	cout << "[L4 Header: " << l4_header_size << "] ";
+	cout << "[L2 Header size: " << l2_header_size << "] ";
+	cout << "[L3 Header size: " << l3_header_size << "] ";
+	cout << "[L4 Header size: " << l4_header_size << "] ";
 	cout << "[Contents: " << content_size << "] " << endl;
 
 

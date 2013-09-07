@@ -26,7 +26,7 @@
 #define DEBUG_END cout << flush; RESET }
 
 //#define ST_REBUILD_DEBUG_EN
-#define PACKET_DEBUG_EN
+//#define PACKET_DEBUG_EN
 //#define MASTER_DEBUG_EN
 //#define MPF_DEBUG_EN
 //#define OBSERVER_DEBUG_EN
