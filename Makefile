@@ -76,7 +76,7 @@ tar:
 	tar cvzf $(TARGET).tar.gz *.cc *.h makefile
 
 trunc:
-	psql -h localhost -Usrim negi -c "truncate table save_stream; truncate table save_result; select setval('save_result_id_seq',1);select setval('save_data_id_seq',1);"
+	psql -h localhost -Unegi negi_debug -c "truncate table save_stream; truncate table save_result; select setval('save_result_id_seq',1);select setval('save_data_id_seq',1);"
 
 debug:
 	make trunc

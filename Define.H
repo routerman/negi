@@ -61,3 +61,5 @@ enum StringMatch{
 enum ProcList{
 	MANAGER, MASTER, CAPTURE
 };
+
+

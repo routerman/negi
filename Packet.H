@@ -35,10 +35,15 @@ class Packet
 		Stream *stream;					// pointer to stream that packet belong to
 		unsigned char* packet;			// ponter to packet binary
 		struct ether_header* eth_header;	// pointer to Ether header structure
+		struct vlan_ethhdr* vlan_eth_header;	// pointer to VLAN tagged Ether header structure
 		struct iphdr* ip_header;			// pointer to IP header structure
 		struct ip6_hdr* ip6_header;			// pointer to IP header structure
 		struct tcphdr* tcp_header;		// pointer to TCP header structure 
 		unsigned int l2_header_size;	// L2(MAC) header size
+		unsigned int ether_proto;
+
+		bool vlan_tag_flag;				//TRUE if vlan tagged
+
 		unsigned int l3_header_size;	// L3(IP) header size
 		unsigned int l4_header_size;	// L4(TCP/UDP) header size
 		unsigned int packet_size;		// packet size (caliculated from IP header) <- nomally use this!

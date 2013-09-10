@@ -51,6 +51,7 @@ using namespace std;
 #include <utility>
 #include <pthread.h>
 #include <sstream>
+#include "vlan_hdr.h"
 
 #ifdef USE_POSTGRES
 #include <pqxx/pqxx>

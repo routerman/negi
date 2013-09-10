@@ -29,9 +29,18 @@ Packet::Packet(PacketCnt *pcnt){
 	l2_header_size = sizeof(struct ether_header);
 	eth_header = (struct ether_header *) packet;
 
-	l3_header = packet + sizeof(struct ether_header); //IP header
 
-	switch (ntohs(eth_header->ether_type)){
+	if(ntohs(eth_header->ether_type) == ETH_P_8021Q){
+		l3_header = packet + sizeof(struct vlan_ethhdr);
+		vlan_eth_header = (struct vlan_ethhdr *) packet;
+		ether_proto = ntohs(vlan_eth_header->ether_type);
+	}else{
+		l3_header = packet + sizeof(struct ether_header); //IP header
+		ether_proto = ntohs(eth_header->ether_type);
+	}
+
+//	Show();
+	switch (ether_proto){
 		case ETH_P_IP:
 			PACKET_DEBUG(RED cout << "IPv4!" << endl ;RESET);
 			version = 4;
@@ -74,7 +83,6 @@ Packet::Packet(PacketCnt *pcnt){
 			inet_ntop(AF_INET6, &dst_ip, dst_ip_str, INET6_ADDRSTRLEN);
 
 			ip_header = NULL;
-
 			break;
 //*/
 
@@ -105,6 +113,9 @@ Packet::Packet(PacketCnt *pcnt){
 		rst = tcp_header->rst;
 		l4_header_size = tcp_header->doff*4;
 		content_size = packet_size - l2_header_size - l3_header_size - l4_header_size;
+
+		PACKET_DEBUG(Show());
+
 	} else if(protocol == IPPROTO_UDP){
 		PACKET_DEBUG(RED cout << "UDP Packet!" << endl ;RESET);
 		struct udphdr* udp_header = (struct udphdr *)l4_header;
@@ -239,6 +250,14 @@ void Packet::Show(){
 	YELLOW
 	cout << "PACKET------------------------------------" <<endl;
 	cout << "Timestamp: " << timestamp.tv_sec << "." << timestamp.tv_usec <<endl;
+
+	cout << "VLAN Status: ";
+	if(vlan_tag_flag){
+		cout << "tagged!" ;
+	}else {cout << "no tag.";
+	} 
+	cout << endl;
+
 	cout << "EtherID: " << protocol <<endl;
 	cout << "IP: " << src_ip_str << ":" << src_port << " -> " << dst_ip_str << ":" << dst_port <<endl;
 	cout << "Packet size: [ORG " << packet_size_org <<"] ";

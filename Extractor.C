@@ -21,6 +21,8 @@ Extractor::Extractor(){
 
 
 void Extractor::Proc(Packet *pkt){
+//	cout << "extractor proc!!" << endl;
+//	pkt->Show();
 //	pkt->GetStream()->GetResultIt();
 
 	if(pkt->GetStream() != 0){
