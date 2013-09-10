@@ -29,6 +29,25 @@ Packet::Packet(PacketCnt *pcnt){
 	l2_header_size = sizeof(struct ether_header);
 	eth_header = (struct ether_header *) packet;
 
+///*
+	stringstream ss;
+	ss.str("");
+	ss.clear(stringstream::goodbit);
+	for(int i = 0; i < 5; i++){
+		ss << hex << setw(2) << setfill('0') <<  (int)eth_header->ether_shost[i] << ":";
+	}
+	ss << hex << setw(2) << setfill('0') << (int)eth_header->ether_shost[5];
+	src_mac_addr = ss.str();
+
+	ss.str("");
+	ss.clear(stringstream::goodbit);
+	for(int i = 0; i < 5; i++){
+		ss << hex << setw(2) << setfill('0') <<  (int)eth_header->ether_dhost[i] << ":";
+	}
+	ss << hex << setw(2) << setfill('0') << (int)eth_header->ether_dhost[5];
+	dst_mac_addr = ss.str();
+
+//*/
 
 	if(ntohs(eth_header->ether_type) == ETH_P_8021Q){
 		l3_header = packet + sizeof(struct vlan_ethhdr);

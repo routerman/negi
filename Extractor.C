@@ -115,7 +115,7 @@ void Extractor::Proc(Packet *pkt){
 
 				if((*it)->GetFinished()){
 					//Lets save it to PGSQL
-///*
+/*
 				cout << "this is result!!--------------------" << endl;
 //				pkt->Show();
 			//	cout << "TimeStamp: "; observer.ShowMem(pkt->GetTimestamp()) ;
@@ -155,16 +155,18 @@ void Extractor::Proc(Packet *pkt){
 				}
 
 				cout << "------------------------------------" << endl;
-//*/
+*/
+				cout << "MAC Addr:" << pkt->GetDstMacAddr() << ",";
+				YELLOW cout << (*it)->GetResultString()  << endl; RESET
 
 					ostringstream oss;
 					oss.str("");
 
-					oss << "insert into save_result(id, stream_id, rule_id, pattern, pattern_len, place,timestamp, src_ip, dst_ip, src_port, dst_port ,result) values "\
+					oss << "insert into save_result(id, stream_id, rule_id, pattern, pattern_len, place,timestamp, src_ip, dst_ip, src_port, dst_port, src_mac_addr, dst_mac_addr ,result) values "\
 					<< "(default,'" << pkt->GetStream()->GetStreamId() << "','" << (*it)->GetRuleId() << "','" \
 					<< (*it)->GetPRule()->GetPreFilterPattern() << "','" << (*it)->GetPatLen() << "','" << (*it)->GetPlaceOfPacket() << "','" \
 					<< tstamp << "','" << pkt->GetSrcIPStr() << "','" << pkt->GetDstIPStr() << "','" \
-					<< pkt->GetSrcPort() << "','" << pkt->GetDstPort();
+					<< pkt->GetSrcPort() << "','" << pkt->GetDstPort() << "', '" << pkt->GetSrcMacAddr() << "', '" << pkt->GetDstMacAddr();
 
 					string query = oss.str();
 

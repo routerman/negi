@@ -42,6 +42,9 @@ class Packet
 		unsigned int l2_header_size;	// L2(MAC) header size
 		unsigned int ether_proto;
 
+		string src_mac_addr;
+		string dst_mac_addr;
+
 		bool vlan_tag_flag;				//TRUE if vlan tagged
 
 		unsigned int l3_header_size;	// L3(IP) header size
@@ -97,6 +100,8 @@ class Packet
 		PacketCnt *GetPacketContainer(){return packet_cnt;}
 		unsigned char *GetL3Header();
 		unsigned char *GetL4Header();
+		string GetSrcMacAddr(){return src_mac_addr;}
+		string GetDstMacAddr(){return dst_mac_addr;}
 		struct in6_addr GetSrcIP(){return src_ip;}
 		struct in6_addr GetDstIP(){return dst_ip;}
 		char* GetSrcIPStr(){return src_ip_str;}
