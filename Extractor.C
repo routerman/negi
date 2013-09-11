@@ -156,8 +156,10 @@ void Extractor::Proc(Packet *pkt){
 
 				cout << "------------------------------------" << endl;
 */
+/*
 				cout << "MAC Addr:" << pkt->GetDstMacAddr() << ",";
 				YELLOW cout << (*it)->GetResultString()  << endl; RESET
+*/
 
 					ostringstream oss;
 					oss.str("");
@@ -172,8 +174,9 @@ void Extractor::Proc(Packet *pkt){
 
 #ifdef USE_POSTGRES
 					query += "',E'"+escape_binary((*it)->GetResultString(), (*it)->GetResultSize())+"');";
-//					cout << query << endl;
 
+
+			//		query += "',E'"+T.esc_raw((*it)->GetResultString(), pkt->GetContentSize())+"');";
 #else
 					char * temp = (char *)malloc(sizeof(char)* 100);
 					memcpy(temp, (char *)((*it)->GetResultString()), 99);

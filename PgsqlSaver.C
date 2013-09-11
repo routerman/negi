@@ -97,8 +97,8 @@ void PgsqlSaver::Proc(Stream * stream){
 	connection *conn = pgsql->GetConn();
 	work T(*conn);
 	try{
-		T.exec(query);
-		T.commit();
+//		T.exec(query);
+//		T.commit();
 	}
 	catch(const exception &e){
 		cerr << e.what() << endl;
