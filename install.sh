@@ -27,7 +27,7 @@ sed -i -e s/ident/trust/ /etc/postgresql/8.4/main/pg_hba.conf
 psql -U postgres -c "create user $DBUSERNAME"
 psql -U postgres -c "create database $DBNAME"
 psql -U postgres -c "grant all privileges on database $DBNAME to $DBUSERNAME;"
-psql -U $DBUSERNAME $DBNAME < ./template/scripts/negi.sql
+psql -U $DBUSERNAME $DBNAME < ./template/script/negi.sql
 
 make clean
 make dep
