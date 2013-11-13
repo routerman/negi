@@ -26,6 +26,9 @@
 #include "Master.H"
 #include "MatchPreFilter.H"
 #include "Extractor.H"
+
+#include "Uba.H"	//-------------->routerman
+
 #include "ResultSaver.H"
 #include "ResultPool.H"
 
@@ -105,3 +108,5 @@ extern pthread_mutex_t sss_cond_mut;
 extern pthread_cond_t sss_cond;
 extern Packet* sss_send_value;
 
+class Uba;
+extern Uba *uba;	//---------------->routerman

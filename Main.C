@@ -52,7 +52,7 @@ if(argc != 2){
 	observer = new Observer;
 	gzip = new Gzip;
 	file_writer = new FileWriter;
-
+	uba = new Uba(); 
 #ifdef USE_POSTGRES
 	pgsql = new Pgsql;
 	pgsql_saver = new PgsqlSaver;

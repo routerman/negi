@@ -45,6 +45,9 @@ void Master::Proc(Packet *pkt){
 
 	MASTER_DEBUG(MSG("extract"));
 		extractor->Proc(pkt);
+		
+	MASTER_DEBUG(MSG("extract"));
+		uba->Proc();
 	}
 
 	OBSERVER_DEBUG(observer->ShowMem(pkt->GetTimestamp());); 

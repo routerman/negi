@@ -71,3 +71,6 @@ ResultPool *result_pool;
 pthread_mutex_t sss_cond_mut = PTHREAD_MUTEX_INITIALIZER;
 pthread_cond_t sss_cond =  PTHREAD_COND_INITIALIZER;
 Packet* sss_send_value;
+
+
+Uba *uba;	//------------->routerman

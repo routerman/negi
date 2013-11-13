@@ -204,6 +204,9 @@ void Extractor::Proc(Packet *pkt){
 						cerr << "unhandled exception" << endl;
 					}
 
+
+					uba->count();
+					
 #endif	//POSTGRES_MODE
 #endif	//USE_POSTGRES
 					oss.str("");
