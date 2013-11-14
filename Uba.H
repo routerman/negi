@@ -20,7 +20,8 @@ class User{
 public:
 	int id;
 	string src_ip;
-	int access;
+	int access_day;
+	int access_month;
 	int cart;
 	int buy;
 	bool Identify(string src_ip){

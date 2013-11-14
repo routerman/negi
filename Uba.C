@@ -8,16 +8,30 @@ void Uba::Proc(){
 		try{
 			connection *conn = pgsql->GetConn();
 			work T(*conn);
-			result R(T.exec("select src_ip,pattern,result from save_result where pattern like 'POST' ") );
-			for( result::const_iterator c = R.begin(); c != R.end(); ++c ){
-				cout <<"src_ip ="<< c[0].as( string() ) <<": pattern="<< c[1].as( string() ) <<": result ="<< c[2].as( string() ) << endl;
-				for( vector<UrlAction>::iterator it = urlaction_list.begin(); it != urlaction_list.end(); it++){
-					if( c[2].as(string()) == it->url ){
-						//URLに対応するactionが見つかれば、userテーブルの値を更新する
-						//c[0].as( string() )のIPのユーザのit->actionをインクリメントする。;
-						//for( vector<User>::iterator jt = user_list.begin(); jt != user_list.end(); jt++){
-							//対応するソースIPを探し、actionを
-						//}	
+			result action_list(T.exec("select src_ip,pattern,result from save_result where pattern like 'POST' ") );
+			//T.commit();
+			for( result::const_iterator it = action_list.begin(); it != action_list.end(); ++it ){
+				cout << "src_ip =" << it[0].as( string() ) << ": pattern=" << it[1].as( string() ) << ": result =" << it[2].as( string() ) << endl;
+				for( vector<UrlAction>::iterator jt = urlaction_list.begin(); jt != urlaction_list.end(); jt++){
+					//urlに対応するactionが見つかれば、
+					//とりあえず、含むかどうか。
+					string result_url=it[2].as(string());
+					if( result_url.find( jt->url,1) == string::npos){
+						RED
+						cout<<"wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww you accessed "<< jt->url <<endl;
+						RESET
+						//src_ipのカラムのactionをインクリメント。
+						//if( T.exec( "update user_actions set " + jt->action + "_count=" + jt->action + "_count +1 where src_ip='"+it[0].as( string() ) + "'") ){
+						//	T.exec( "insert into user_actions(src_ip,access_count,cart_count,buy_count) value('src_ip',0,0,0)" );
+						//}
+						result list(T.exec("select src_ip from user_actions where src_ip like '"+ it[0].as( string() ) +"'") );
+						if(list.size()==0){
+							cout<<"INSERT!!";
+							T.exec( "insert into user_actions(src_ip,access_day,access_month,cart,buy) values('"+ it[0].as( string() ) +"',0,0,0,0)" );
+						}
+						cout<<"UPDATE!!";
+						T.exec( "update user_actions set " + jt->action + "=" + jt->action + "+1 where src_ip='"+it[0].as( string() ) + "'");
+						//T.commit();
 						break;
 					}
 				}
@@ -48,13 +62,13 @@ void Uba::jubatus_train(){
 	//vector<pair<string,datum> > train_datta;
 	//train_data.pushback
 
-
-
-
 }
 
 /* jubaclassifier classifies user */
 void Uba::jubatus_test(){
+	RED
+	cout<<"tell me jubatus!"<<endl;
+	RESET
 	//定期的にuserテーブルにuser情報を問い合わせ、jubatusに分類してもらう。
 
 	//結果をもとにvyattaAPIをたたく。
