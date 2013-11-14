@@ -4,9 +4,17 @@
 #include "Include.H"
 #include "Packet.H"
 #include "Global.H"
-
 //#include "/opt/jubatus/include/jubatus/client.hpp"
+#include <jubatus/client.hpp>
+
 using namespace std;
+using std::make_pair;
+using std::pair;
+using std::string;
+using std::vector;
+using jubatus::classifier::datum;
+using jubatus::classifier::estimate_result;
+
 
 class User{
 public:
@@ -27,13 +35,30 @@ public:
 	}
 };
 
+class UrlAction{
+public:
+	string url;
+	string host;
+	string action;
+	UrlAction(string url, string host, string action){
+		this->url=url;
+		this->host=host;
+		this->action=action;
+	}
+};
+
 
 class Uba{
 public:
-	unsigned int counter;
-	vector<Result> result_list;
+	unsigned int counter,jubacounter;
+	vector<UrlAction> urlaction_list;
+	vector<User> user_list;
 	void count(){counter++;}
 	void Proc();
+	void jubatus_train();
+	void jubatus_test();
 	Uba();
 };
+
+
 

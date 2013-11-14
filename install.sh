@@ -34,25 +34,30 @@ make dep
 make
 
 #configuration pcap.conf
-echo "type pcap" > ./template/config/pcap.conf
-echo "filename test.pcap" >> ./template/config/pcap.conf
-echo "dbname $DBNAME" >> ./template/config/pcap.conf
-echo "dbuser $DBUSERNAME" >> ./template/config/pcap.conf
-echo "dbpass " >> ./template/config/pcap.conf
-echo "dbhost localhost" >> ./template/config/pcap.conf
-echo "gc_remove_time 600" >> ./template/config/pcap.conf
+
+cat << END > ./template/config/pcap.conf
+type pcap
+filename test.pcap
+dbname $DBNAME
+dbuser $DBUSERNAME
+dbpass 
+dbhost localhost
+gc_remove_time 600
+END
 
 #configuration eth1.conf
-echo "type ether" > ./template/config/eth1.conf
-echo "device eth1" >> ./template/config/eth1.conf
-echo "dbname $DBNAME" >> ./template/config/eth1.conf
-echo "dbuser $DBUSERNAME" >> ./template/config/eth1.conf
-echo "dbpass " >> ./template/config/eth1.conf
-echo "dbhost localhost" >> ./template/config/eth1.conf
-echo "gc_remove_time 600" >> ./template/config/eth1.conf
+cat << END > ./template/config/eht0.conf
+type ether
+device eth0
+dbname $DBNAME
+dbuser $DBUSERNAME
+dbpass 
+dbhost localhost
+gc_remove_time 600
+END
 
 . /opt/jubatus/profile
 
 
 echo "オフラインモードで実行するにはtcpdump等でtest.pcapを用意し、./negi template/config/pcap.confを実行してください。"
-echo "オンラインモードで実行するには./negi template/config/eth1.confを実行してください。"
+echo "オンラインモードで実行するには./negi template/config/eth0.confを実行してください。"

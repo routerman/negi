@@ -249,6 +249,77 @@ CREATE TABLE save_stream (
 
 ALTER TABLE public.save_stream OWNER TO postgres;
 
+------------->routerman start
+
+
+
+
+
+--
+-- Name: url_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE url_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+    CYCLE;
+
+
+ALTER TABLE public.url_id_seq OWNER TO postgres;
+
+--
+-- Name: url; Type: TABLE; Schema: public; Owner: postgres; Tablespace:
+--
+
+CREATE TABLE url (
+    id integer DEFAULT nextval('url_id_seq'::regclass) NOT NULL,
+    url string,
+    host string,
+    action string,
+);
+
+ALTER TABLE public.url OWNER TO postgres;
+
+
+
+--
+--Name: user_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE user_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+    CYCLE;
+
+
+ALTER TABLE public.user_id_seq OWNER TO postgres;
+
+--
+-- Name: user; Type: TABLE; Schema: public; Owner: postgres; Tablespace:
+--
+
+CREATE TABLE user (
+    id integer DEFAULT nextval('user_id_seq'::regclass) NOT NULL,
+    src_ip string,
+    accese_count integer,
+    cart_count integer,
+    buy_count integer,
+    user_type text
+);
+
+
+ALTER TABLE public.user OWNER TO postgres;
+
+
+-------------->routerman end
+
+
 --
 -- Name: update_check; Type: TABLE; Schema: public; Owner: postgres; Tablespace:
 --
