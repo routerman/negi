@@ -32,7 +32,7 @@ public:
 	}
 	User(string src_ip){
 		this->src_ip = src_ip;
-		access = cart = buy = 0;
+		access_day = access_month = cart = buy = 0;
 	}
 };
 
