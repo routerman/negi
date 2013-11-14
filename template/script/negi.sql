@@ -251,15 +251,11 @@ ALTER TABLE public.save_stream OWNER TO postgres;
 
 ------------->routerman start
 
-
-
-
-
 --
--- Name: url_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+-- Name: url_action_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
-CREATE SEQUENCE url_id_seq
+CREATE SEQUENCE url_action_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -268,21 +264,20 @@ CREATE SEQUENCE url_id_seq
     CYCLE;
 
 
-ALTER TABLE public.url_id_seq OWNER TO postgres;
+ALTER TABLE public.url_action_id_seq OWNER TO postgres;
 
 --
--- Name: url; Type: TABLE; Schema: public; Owner: postgres; Tablespace:
+-- Name: url_action; Type: TABLE; Schema: public; Owner: postgres; Tablespace:
 --
 
-CREATE TABLE url (
-    id integer DEFAULT nextval('url_id_seq'::regclass) NOT NULL,
-    url string,
-    host string,
-    action string,
+CREATE TABLE url_action (
+    id integer DEFAULT nextval('url_action_id_seq'::regclass) NOT NULL,
+    url text,
+    host text,
+    action text
 );
 
-ALTER TABLE public.url OWNER TO postgres;
-
+ALTER TABLE public.url_action OWNER TO postgres;
 
 
 --
@@ -301,24 +296,21 @@ CREATE SEQUENCE user_id_seq
 ALTER TABLE public.user_id_seq OWNER TO postgres;
 
 --
--- Name: user; Type: TABLE; Schema: public; Owner: postgres; Tablespace:
+-- Name: user_actions; Type: TABLE; Schema: public; Owner: postgres; Tablespace:
 --
 
-CREATE TABLE user (
+CREATE TABLE user_actions(
     id integer DEFAULT nextval('user_id_seq'::regclass) NOT NULL,
-    src_ip string,
+    src_ip text,
     accese_count integer,
     cart_count integer,
     buy_count integer,
-    user_type text
+    class text
 );
 
-
-ALTER TABLE public.user OWNER TO postgres;
-
+ALTER TABLE public.user_actions OWNER TO postgres;
 
 -------------->routerman end
-
 
 --
 -- Name: update_check; Type: TABLE; Schema: public; Owner: postgres; Tablespace:
