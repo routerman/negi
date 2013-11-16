@@ -276,8 +276,8 @@ CREATE TABLE url_action (
     method text,
 	 url text,
 	 referer text,	
-    action text
-	 data text,
+    action text,
+	 data text
 );
 
 ALTER TABLE public.url_action OWNER TO postgres;
