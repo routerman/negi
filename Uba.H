@@ -38,9 +38,12 @@ public:
 
 class UrlAction{
 public:
-	string url;
 	string host;
+	string method;
+	string url;
+	string referer;
 	string action;
+	string data;
 	UrlAction(string url, string host, string action){
 		this->url=url;
 		this->host=host;

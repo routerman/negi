@@ -272,9 +272,12 @@ ALTER TABLE public.url_action_id_seq OWNER TO postgres;
 
 CREATE TABLE url_action (
     id integer DEFAULT nextval('url_action_id_seq'::regclass) NOT NULL,
-    url text,
     host text,
+    method text,
+	 url text,
+	 referer text,	
     action text
+	 data text,
 );
 
 ALTER TABLE public.url_action OWNER TO postgres;
@@ -296,20 +299,22 @@ CREATE SEQUENCE user_id_seq
 ALTER TABLE public.user_id_seq OWNER TO postgres;
 
 --
--- Name: user_actions; Type: TABLE; Schema: public; Owner: postgres; Tablespace:
+-- Name: user_shop_actions; Type: TABLE; Schema: public; Owner: postgres; Tablespace:
 --
 
-CREATE TABLE user_actions(
+CREATE TABLE user_shop_actions(
     id integer DEFAULT nextval('user_id_seq'::regclass) NOT NULL,
     src_ip text,
     access_day integer,
+	 access_time_day integer,
     access_month integer,
+	 access_time_month integer,
     cart integer,
     buy integer,
     class text
 );
 
-ALTER TABLE public.user_actions OWNER TO postgres;
+ALTER TABLE public.user_shop_actions OWNER TO postgres;
 
 -------------->routerman end
 

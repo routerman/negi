@@ -15,22 +15,19 @@ void Uba::Proc(){
 					//とりあえず、含むかどうか。
 					string result_url=it[2].as(string());
 					if( result_url.find( jt->url,0) != string::npos){
-						//RED
-						//cout<<"wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww you accessed "<< jt->url <<endl;
-						//RESET
 						//src_ipのカラムのactionをインクリメント。
-						//if( T.exec( "update user_actions set " + jt->action + "_count=" + jt->action + "_count +1 where src_ip='"+it[0].as( string() ) + "'") ){
-						//	T.exec( "insert into user_actions(src_ip,access_count,cart_count,buy_count) value('src_ip',0,0,0)" );
+						//if( T.exec( "update user_shop_actions set " + jt->action + "_count=" + jt->action + "_count +1 where src_ip='"+it[0].as( string() ) + "'") ){
+						//	T.exec( "insert into user_shop_actions(src_ip,access_count,cart_count,buy_count) value('src_ip',0,0,0)" );
 						//}
-						result list(T.exec("select src_ip from user_actions where src_ip like '"+ it[0].as( string() ) +"'") );
+						result list(T.exec("select src_ip from user_shop_actions where src_ip like '"+ it[0].as( string() ) +"'") );
 						RED
 						cout<< result_url <<endl;
 						if(list.size()==0){
-							cout<< "INSERT!!" + it[0].as( string() );
-							T.exec( "insert into user_actions(src_ip,access_day,access_month,cart,buy) values('"+ it[0].as( string() ) +"',0,0,0,0)" );
+							cout << "INSERT!!" + it[0].as( string() ) << endl;
+							T.exec( "insert into user_shop_actions(src_ip,access_day,access_month,cart,buy) values('"+ it[0].as( string() ) +"',0,0,0,0)" );
 						}
-						cout<< "UPDATE!!" <<endl;
-						T.exec( "update user_actions set " + jt->action + "=" + jt->action + "+1 where src_ip='"+it[0].as( string() ) + "'");
+						cout << "UPDATE!!" + it[0].as( string() ) << endl;
+						T.exec( "update user_shop_actions set " + jt->action + "=" + jt->action + "+1 where src_ip='"+it[0].as( string() ) + "'");
 						RESET
 						//T.commit();
 						break;
