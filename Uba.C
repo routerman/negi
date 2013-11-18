@@ -7,11 +7,16 @@ void Uba::Proc(){
 		try{
 			connection *conn = pgsql->GetConn();
 			work T(*conn);
-			result result_list( T.exec("select src_ip,dst_ip,pattern,result,timestamp from save_result where pattern like 'POST'") );
+			result *result_list;
+			result_list = new result( T.exec("select src_ip,dst_ip,pattern,result,timestamp from save_result where pattern like 'POST'") );
 			//T.commit();
-			for( result::const_iterator it = result_list.begin(); it != result_list.end(); ++it ){
+			for( result::const_iterator it = result_list->begin(); it != result_list->end(); ++it ){
 				//cout << "src_ip =" << it[0].as( string() ) << ": pattern=" << it[1].as( string() ) << ": result =" << it[2].as( string() ) << endl;
-				string host = getHost( it[1].as(string()) ); 
+				//dst_ipでホストを調べるユーザ分析対象は登録しているHOSTに限定する	
+				//if( ( mit = record_map.find( it[1].as( string() ) ) == record_map.end() )continue;
+				mit = record_map.find( it[1].as( string() ) );
+				if( mit == record_map.end() )continue;
+				string host = (*mit).second;
 				for( vector<UrlAction>::iterator jt = url_action_list.begin(); jt != url_action_list.end(); jt++){
 					//とりあえず、resultにurlが含むかどうか。
 					if( it[3].as( string() ).find( jt->url,0) != string::npos){
@@ -24,16 +29,16 @@ void Uba::Proc(){
 						//cout<< result_url <<endl;
 						if(list.size()==0){
 							cout << "INSERT!!" + it[0].as( string() ) << endl;
-							T.exec( "insert into user_shop_actions(src_ip,access_day,access_month,cart,buy) values('"+ it[0].as( string() ) +"',0,0,0,0)" );
+							T.exec( "insert into user_shop_actions(src_ip,host,access_day,access_month,cart,buy) values('"+ it[0].as( string() ) +"','"+ host +"',0,0,0,0)" );
 						}
 						cout << "UPDATE!!" + it[0].as( string() ) << endl;
-						T.exec( "update user_shop_actions set " + jt->action + "=" + jt->action + "+1 where src_ip='"+it[0].as( string() ) + "'");
+						T.exec( "update user_shop_actions set " + jt->action + "=" + jt->action + "+1 where src_ip='"+it[0].as( string() ) + "' and host='"+ host +"'");
 						RESET
 						//T.commit();
 						break;
 					}
 				}
-				if( it==result_list.end() ){
+				if( it==result_list->end() ){
 					before_timestamp = it[4].as( string() );
 				}
 			}
@@ -77,22 +82,21 @@ void Uba::jubatus_test(){
 
 }
 
-//引数のIPアドレスのHOST名を返す。無ければ、IPアドレスを返す。
-string Uba::getHost(string dst_ip){
-	for( vector<Record>::iterator it = record_list.begin(); it!=record_list.end(); it++){
-		if( it->dst_ip==dst_ip ){
-			return it->host;
-		}
-	}
-	return dst_ip;//登録されてない場合はdst_ipをそのまま返すか、dnsに問い合わせるか。
-}
-
 //データベースのデータをリストに展開する。それか、DNSにホスト名からIPをといあわせるか？
 void Uba::InitRecordList(){
-	//Record *tmp;
-	//とりあえず、最初は、直打ち
-	//tmp = new Record("","nitori"): 
-	//record_list.push_back(tmp);
+	//とりあえず、最初は、直打ち	
+	//record_map.insert(make_pair("",""));
+	record_map.insert(make_pair("54.240.248.0","www.amazon.co.jp"));
+	record_map.insert(make_pair("202.72.50.10","www.rakuten.co.jp"));
+	record_map.insert(make_pair("202.32.114.47","www.32.114.47"));
+	record_map.insert(make_pair("210.129.151.129","kakaku.com"));
+	record_map.insert(make_pair("202.247.10.161","www.takashimaya.co.jp"));
+	record_map.insert(make_pair("69.171.229.25","www.facebook.com"));
+	record_map.insert(make_pair("203.216.231.189","www.yahoo.co.jp"));
+	//record_map.insert(make_pair("",""));
+	//record_map.insert(make_pair("",""));
+	//record_map.insert(make_pair("",""));
+	record_map.insert(make_pair("*","not found!"));
 }
 
 void Uba::InitUrlActionList(){

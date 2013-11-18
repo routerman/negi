@@ -51,20 +51,6 @@ public:
 	}
 };
 
-class Record{
-public:
-	string dst_ip;
-	string host;
-	Record(string dst_ip,string host){
-		this->dst_ip = dst_ip;
-		this->host = host;
-	}
-	//string getHost(string ){
-		
-	//}
-};
-
-
 class Uba{
 public:
 	jubatus::classifier::client::classifier *client;
@@ -72,7 +58,8 @@ public:
 	string before_timestamp;
 	vector<UrlAction> url_action_list;
 	vector<User> user_list;
-	vector<Record> record_list;
+	map<string,string> record_map;
+   map<string,string>::iterator mit;
 	void count(){counter++;}
 	void Proc();
 	void jubatus_test();

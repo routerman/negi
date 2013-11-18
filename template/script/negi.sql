@@ -305,7 +305,8 @@ ALTER TABLE public.user_id_seq OWNER TO postgres;
 CREATE TABLE user_shop_actions(
     id integer DEFAULT nextval('user_id_seq'::regclass) NOT NULL,
     src_ip text,
-    access_day integer,
+    host text,
+	 access_day integer,
 	 access_time_day integer,
     access_month integer,
 	 access_time_month integer,
