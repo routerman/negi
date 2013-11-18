@@ -59,7 +59,11 @@ dbhost localhost
 gc_remove_time 600
 END
 
-
+cat << END >> $HOME/.bashrc
+if [ -f /opt/jubatus/profile ];then
+	. /opt/jubatus/profile;
+fi
+END
 
 echo "オフラインモードで実行するにはtcpdump等でtest.pcapを用意し、./negi template/config/pcap.confを実行してください。"
 echo "オンラインモードで実行するには./negi template/config/eth0.confを実行してください。"

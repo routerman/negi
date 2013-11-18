@@ -316,6 +316,33 @@ CREATE TABLE user_shop_actions(
 
 ALTER TABLE public.user_shop_actions OWNER TO postgres;
 
+
+--
+--Name: record_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE record_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+    CYCLE;
+
+ALTER TABLE public.record_id_seq OWNER TO postgres;
+
+--
+-- Name: record; Type: TABLE; Schema: public; Owner: postgres; Tablespace:
+--
+
+CREATE TABLE dns(
+    id integer DEFAULT nextval('record_id_seq'::regclass) NOT NULL,
+    dst_ip text,
+	 host text
+);
+
+ALTER TABLE public.dns OWNER TO postgres;
+
 -------------->routerman end
 
 --

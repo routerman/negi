@@ -51,18 +51,36 @@ public:
 	}
 };
 
-
-class Uba{
+class Record{
 public:
-	unsigned int counter,jubacounter;
-	vector<UrlAction> urlaction_list;
-	vector<User> user_list;
-	void count(){counter++;}
-	void Proc();
-	void jubatus_train();
-	void jubatus_test();
-	Uba();
+	string dst_ip;
+	string host;
+	Record(string dst_ip,string host){
+		this->dst_ip = dst_ip;
+		this->host = host;
+	}
+	//string getHost(string ){
+		
+	//}
 };
 
 
+class Uba{
+public:
+	jubatus::classifier::client::classifier *client;
+	unsigned int counter,jubacounter;
+	string before_timestamp;
+	vector<UrlAction> url_action_list;
+	vector<User> user_list;
+	vector<Record> record_list;
+	void count(){counter++;}
+	void Proc();
+	void jubatus_test();
+	string getHost(string dst_ip);	
+	
+	void InitRecordList();
+	void InitUrlActionList();
+	void InitJubatus();
+	Uba();
+};
 
