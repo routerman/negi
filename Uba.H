@@ -62,7 +62,7 @@ public:
    map<string,string>::iterator mit;
 	void count(){counter++;}
 	void Proc();
-	void jubatus_test();
+	void Jubatus_test();
 	string getHost(string dst_ip);	
 	
 	void InitRecordList();

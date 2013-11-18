@@ -12,30 +12,32 @@ void Uba::Proc(){
 			//T.commit();
 			for( result::const_iterator it = result_list->begin(); it != result_list->end(); ++it ){
 				//cout << "src_ip =" << it[0].as( string() ) << ": pattern=" << it[1].as( string() ) << ": result =" << it[2].as( string() ) << endl;
-				//dst_ipでホストを調べるユーザ分析対象は登録しているHOSTに限定する	
 				//if( ( mit = record_map.find( it[1].as( string() ) ) == record_map.end() )continue;
 				mit = record_map.find( it[1].as( string() ) );
-				if( mit == record_map.end() )continue;
+				if( mit == record_map.end() )continue;	//HOSTが登録されてなければ無視
 				string host = (*mit).second;
 				for( vector<UrlAction>::iterator jt = url_action_list.begin(); jt != url_action_list.end(); jt++){
 					//とりあえず、resultにurlが含むかどうか。
-					if( it[3].as( string() ).find( jt->url,0) != string::npos){
-						RED
-						//src_ipのカラムのactionをインクリメント。
-						//if( T.exec( "update user_shop_actions set " + jt->action + "_count=" + jt->action + "_count +1 where src_ip='"+it[0].as( string() ) + "'") ){
-						//	T.exec( "insert into user_shop_actions(src_ip,access_count,cart_count,buy_count) value('src_ip',0,0,0)" );
-						//}
-						result list(T.exec("select src_ip from user_shop_actions where src_ip like '"+ it[0].as( string() ) +"'") );
-						//cout<< result_url <<endl;
-						if(list.size()==0){
-							cout << "INSERT!!" + it[0].as( string() ) << endl;
-							T.exec( "insert into user_shop_actions(src_ip,host,access_day,access_month,cart,buy) values('"+ it[0].as( string() ) +"','"+ host +"',0,0,0,0)" );
+					if( jt->host==host ){
+						//ACCESS COUNT
+						if( it[3].as( string() ).find( jt->url,0 ) != string::npos ){
+							RED
+							//src_ipのカラムのactionをインクリメント。
+							//if( T.exec( "update user_shop_actions set " + jt->action + "_count=" + jt->action + "_count +1 where src_ip='"+it[0].as( string() ) + "'") ){
+							//	T.exec( "insert into user_shop_actions(src_ip,access_count,cart_count,buy_count) value('src_ip',0,0,0)" );
+							//}
+							result list(T.exec("select src_ip from user_shop_actions where src_ip like '"+ it[0].as( string() ) +"' and host= '"+ host +"'") );
+							//cout<< result_url <<endl;
+							if(list.size()==0){
+								cout << "INSERT!!" + it[0].as( string() ) << "in host="<< host <<endl;
+								T.exec( "insert into user_shop_actions(src_ip,host,access_day,access_month,cart,buy) values('"+ it[0].as( string() ) +"','"+ host +"',0,0,0,0)" );
+							}
+							cout << "UPDATE!!" + it[0].as( string() )<<" in host=" << host <<endl;
+							T.exec( "update user_shop_actions set " + jt->action + "=" + jt->action + "+1 where src_ip='"+it[0].as( string() ) + "' and host='"+ host +"'");
+							RESET
+							//T.commit();
+							break;
 						}
-						cout << "UPDATE!!" + it[0].as( string() ) << endl;
-						T.exec( "update user_shop_actions set " + jt->action + "=" + jt->action + "+1 where src_ip='"+it[0].as( string() ) + "' and host='"+ host +"'");
-						RESET
-						//T.commit();
-						break;
 					}
 				}
 				if( it==result_list->end() ){
@@ -51,47 +53,21 @@ void Uba::Proc(){
 		catch(...){
 			cerr << "routerman >> unhandled error!! :)" << endl;
 		}
-		if(jubacounter > 10){
-			jubacounter=0;
-			jubatus_test();
-		}else{
-			jubacounter++;
-		}
+		Jubatus_test();
 		RED cout<<"Uba::Proc() end" <<endl; RESET
 	}
 }
 
-/* initiation of jubaclassifier */
-void Uba::InitJubatus(){
-	//初めにjubaclassifierに学習させる。
-	//jubatus::classifier::client::classifier client("localhost",9199,1.0);
-	//vector<pair<string,datum> > train_datta;
-	//train_data.pushback
-
-}
-
-/* jubaclassifier classifies user */
-void Uba::jubatus_test(){
-	RED
-	cout<<"tell me jubatus!"<<endl;
-	RESET
-	//jubatus::classifier::client::classifier client("localhost",9199,1.0);
-	//定期的にuserテーブルにuser情報を問い合わせ、jubatusに分類してもらう。
-
-	//結果をもとにvyattaAPIをたたく。
-
-}
-
 //データベースのデータをリストに展開する。それか、DNSにホスト名からIPをといあわせるか？
 void Uba::InitRecordList(){
-	//とりあえず、最初は、直打ち	
+	//とりあえず、最初は、直打ち	そのうちデータベース上に。
 	//record_map.insert(make_pair("",""));
-	record_map.insert(make_pair("54.240.248.0","www.amazon.co.jp"));
-	record_map.insert(make_pair("202.72.50.10","www.rakuten.co.jp"));
-	record_map.insert(make_pair("202.32.114.47","www.32.114.47"));
+	record_map.insert(make_pair("54.240.248.0"   ,"www.amazon.co.jp"));
+	record_map.insert(make_pair("202.72.50.10"   ,"www.rakuten.co.jp"));
+	record_map.insert(make_pair("202.32.114.47"  ,"www.nitori-net.jp"));
 	record_map.insert(make_pair("210.129.151.129","kakaku.com"));
-	record_map.insert(make_pair("202.247.10.161","www.takashimaya.co.jp"));
-	record_map.insert(make_pair("69.171.229.25","www.facebook.com"));
+	record_map.insert(make_pair("202.247.10.161" ,"www.takashimaya.co.jp"));
+	record_map.insert(make_pair("69.171.229.25"  ,"www.facebook.com"));
 	record_map.insert(make_pair("203.216.231.189","www.yahoo.co.jp"));
 	//record_map.insert(make_pair("",""));
 	//record_map.insert(make_pair("",""));
@@ -104,7 +80,6 @@ void Uba::InitUrlActionList(){
 	tmp = new UrlAction("/shop/cart/cart.aspx","www.nitori-net.jp","cart");
 	url_action_list.push_back(*tmp);
 }
-
 
 Uba::Uba(){
 	//char ctstamp[32];
@@ -130,3 +105,43 @@ Uba::Uba(){
 	InitUrlActionList();
 	InitJubatus();
 }
+
+/* initiation of jubaclassifier */
+void Uba::InitJubatus(){
+	//初めにjubaclassifierに学習させる。
+	//jubatus::classifier::client::classifier client("localhost",9199,1.0);
+	//vector<pair<string,datum> > train_datta;
+	//train_data.pushback
+
+}
+
+/* jubaclassifier classifies user */
+void Uba::Jubatus_test(){
+	//jubatus::classifier::client::classifier client("localhost",9199,1.0);
+	//定期的にuserテーブルにuser情報を問い合わせ、jubatusに分類してもらう。
+	//結果をもとにvyattaAPIをた
+	jubacounter++;
+	if(jubacounter>20){
+		RED cout<<"Uba::jubatus_test() start()!"<<endl;	RESET
+		jubacounter=0;
+
+		try{
+			connection *conn = pgsql->GetConn();
+			work T(*conn);
+			result *result_list;
+			result_list = new result( T.exec("select src_ip,access_day.access_month,cart,buy from user_shop_actions where where access>=10") );
+			//NOP yet..
+			T.commit();
+		}
+		catch(const exception &e){
+			cerr << e.what() << endl;
+		}
+		catch(...){
+			cerr << "routerman >> unhandled error!! :)" << endl;
+		}
+		RED cout<<"Uba::jubatus_test() end" <<endl; RESET
+	}
+}
+
+
+
