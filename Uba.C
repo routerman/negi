@@ -1,7 +1,7 @@
 #include"Uba.H"
 
 void Uba::Proc(){
-	if(counter>20){
+	if(counter>10){
 		RED cout<<"Uba::Proc() start"<<endl; RESET
 		counter=0;
 		try{
@@ -27,7 +27,7 @@ void Uba::Proc(){
 							//	T.exec( "insert into user_shop_actions(src_ip,access_count,cart_count,buy_count) value('src_ip',0,0,0)" );
 							//}
 							result list(T.exec("select src_ip from user_shop_actions where src_ip like '"+ it[0].as( string() ) +"' and host= '"+ host +"'") );
-							//cout<< result_url <<endl;
+						//cout<< result_url <<endl;
 							if(list.size()==0){
 								cout << "INSERT!!" + it[0].as( string() ) << "in host="<< host <<endl;
 								T.exec( "insert into user_shop_actions(src_ip,host,access_day,access_month,cart,buy) values('"+ it[0].as( string() ) +"','"+ host +"',0,0,0,0)" );
@@ -53,7 +53,7 @@ void Uba::Proc(){
 		catch(...){
 			cerr << "routerman >> unhandled error!! :)" << endl;
 		}
-		Jubatus_test();
+		JubatusProc();
 		RED cout<<"Uba::Proc() end" <<endl; RESET
 	}
 }
@@ -101,6 +101,7 @@ Uba::Uba(){
 	//strptime(,,);
 	counter=0;
 	jubacounter=0;
+	vyatta_counter=0;
 	InitRecordList();
 	InitUrlActionList();
 	InitJubatus();
@@ -116,21 +117,27 @@ void Uba::InitJubatus(){
 }
 
 /* jubaclassifier classifies user */
-void Uba::Jubatus_test(){
+void Uba::JubatusProc(){
 	//jubatus::classifier::client::classifier client("localhost",9199,1.0);
 	//定期的にuserテーブルにuser情報を問い合わせ、jubatusに分類してもらう。
 	//結果をもとにvyattaAPIをた
 	jubacounter++;
-	if(jubacounter>20){
+	if(jubacounter>=2){
 		RED cout<<"Uba::jubatus_test() start()!"<<endl;	RESET
 		jubacounter=0;
-
 		try{
 			connection *conn = pgsql->GetConn();
 			work T(*conn);
 			result *result_list;
-			result_list = new result( T.exec("select src_ip,access_day.access_month,cart,buy from user_shop_actions where where access>=10") );
-			//NOP yet..
+			result_list = new result( T.exec("select src_ip,access_day,access_month,cart,buy from user_shop_actions where access_day>=10") );
+			//make data
+			//send Jubatus
+			//receive result
+			
+			for( result::const_iterator it = result_list->begin(); it != result_list->end(); ++it ){
+				//NOP yet..
+				//T.exec( "update user_shop_actions set " + jt->action + "=" + jt->action + "+1 where src_ip='10.24.129.200' and host='"+ host +"'");
+			}
 			T.commit();
 		}
 		catch(const exception &e){
@@ -139,9 +146,39 @@ void Uba::Jubatus_test(){
 		catch(...){
 			cerr << "routerman >> unhandled error!! :)" << endl;
 		}
+		VyattaProc();
 		RED cout<<"Uba::jubatus_test() end" <<endl; RESET
 	}
 }
 
+
+
+void Uba::VyattaProc(){
+	//結果をもとにvyattaAPIをた
+	vyatta_counter++;
+	if(vyatta_counter>=1){
+		RED cout<<"Uba::VyattaConfig start()!"<<endl;	RESET
+		vyatta_counter=0;
+		try{
+			connection *conn = pgsql->GetConn();
+			work T(*conn);
+			result *result_list;
+			result_list = new result( T.exec("select src_ip from user_shop_actions where class='Good'") );
+			//NOP yet..
+			for( result::const_iterator it = result_list->begin(); it != result_list->end(); ++it ){
+				//vyattaAPI
+				//cli_config_api("set protocols static route "+ it[0].as( string() )  +" next-hop 0.0.0.0");
+			}
+			T.commit();
+		}
+		catch(const exception &e){
+			cerr << e.what() << endl;
+		}
+		catch(...){
+			cerr << "routerman >> unhandled error!! :)" << endl;
+		}
+		RED cout<<"Uba::VyattaConfig() end" <<endl; RESET
+	}
+}
 
 

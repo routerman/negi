@@ -54,7 +54,7 @@ public:
 class Uba{
 public:
 	jubatus::classifier::client::classifier *client;
-	unsigned int counter,jubacounter;
+	unsigned int counter,jubacounter,vyatta_counter;
 	string before_timestamp;
 	vector<UrlAction> url_action_list;
 	vector<User> user_list;
@@ -62,9 +62,12 @@ public:
    map<string,string>::iterator mit;
 	void count(){counter++;}
 	void Proc();
-	void Jubatus_test();
-	string getHost(string dst_ip);	
-	
+	//Jubatus
+	void JubatusProc();
+
+	//vyatta
+	void VyattaProc();
+	//Initiation	
 	void InitRecordList();
 	void InitUrlActionList();
 	void InitJubatus();
