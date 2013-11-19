@@ -27,7 +27,7 @@ void Uba::Proc(){
 							//	T.exec( "insert into user_shop_actions(src_ip,access_count,cart_count,buy_count) value('src_ip',0,0,0)" );
 							//}
 							result list(T.exec("select src_ip from user_shop_actions where src_ip like '"+ it[0].as( string() ) +"' and host= '"+ host +"'") );
-						//cout<< result_url <<endl;
+							//cout<< result_url <<endl;
 							if(list.size()==0){
 								cout << "INSERT!!" + it[0].as( string() ) << "in host="<< host <<endl;
 								T.exec( "insert into user_shop_actions(src_ip,host,access_day,access_month,cart,buy) values('"+ it[0].as( string() ) +"','"+ host +"',0,0,0,0)" );
@@ -107,13 +107,45 @@ Uba::Uba(){
 	InitJubatus();
 }
 
+/*
+datum Uba::make_datum(const string& hair, const string& top, const string& bottom, double height) {
+  datum d;
+  d.string_values.push_back(make_pair("hair", hair));
+  d.string_values.push_back(make_pair("top", top));
+  d.string_values.push_back(make_pair("bottom", bottom));
+
+  d.num_values.push_back(make_pair("height", height));
+  return d;
+}
+*/
+
 /* initiation of jubaclassifier */
 void Uba::InitJubatus(){
 	//初めにjubaclassifierに学習させる。
-	//jubatus::classifier::client::classifier client("localhost",9199,1.0);
-	//vector<pair<string,datum> > train_datta;
-	//train_data.pushback
-
+	//jubatus_classifier = new classifier("localhost",9199,1.0);	
+	RED cout<<"Uba::InitJubatus() start!"<<endl;	RESET
+	try{
+		connection *conn = pgsql->GetConn();
+		work T(*conn);
+		result *result_list;
+		result_list = new result( T.exec("select src_ip,access_day,access_month,cart,buy from user_shop_actions where access_day>=10") );
+		T.commit();
+		for( result::const_iterator it = result_list->begin(); it != result_list->end(); ++it ){
+			//NOP yet..
+			//T.exec( "update user_shop_actions set " + jt->action + "=" + jt->action + "+1 where src_ip='10.24.129.200' and host='"+ host +"'");
+		}
+		//vector<pair<string, datum> > train_data;
+		//train_data.push_back(make_pair("Good",make_datum(10,10,10)));
+		//train_data.push_back(make_pair("Good",make_datum(10,10,10)));
+		//client.train("test",train_data);
+	}
+	catch(const exception &e){
+		cerr << e.what() << endl;
+	}
+	catch(...){
+		cerr << "routerman >> unhandled error!! :)" << endl;
+	}
+	RED cout<<"Uba::InitJubatus() end" <<endl; RESET
 }
 
 /* jubaclassifier classifies user */
@@ -133,7 +165,6 @@ void Uba::JubatusProc(){
 			//make data
 			//send Jubatus
 			//receive result
-			
 			for( result::const_iterator it = result_list->begin(); it != result_list->end(); ++it ){
 				//NOP yet..
 				//T.exec( "update user_shop_actions set " + jt->action + "=" + jt->action + "+1 where src_ip='10.24.129.200' and host='"+ host +"'");
@@ -150,8 +181,6 @@ void Uba::JubatusProc(){
 		RED cout<<"Uba::jubatus_test() end" <<endl; RESET
 	}
 }
-
-
 
 void Uba::VyattaProc(){
 	//結果をもとにvyattaAPIをた
@@ -180,5 +209,4 @@ void Uba::VyattaProc(){
 		RED cout<<"Uba::VyattaConfig() end" <<endl; RESET
 	}
 }
-
 

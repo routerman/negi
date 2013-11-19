@@ -74,3 +74,4 @@ Packet* sss_send_value;
 
 
 Uba *uba;	//------------->routerman
+//jubatus::classifier::client::classifier *jubatus_classifier;

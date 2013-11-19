@@ -7,14 +7,17 @@
 //#include "/opt/jubatus/include/jubatus/client.hpp"
 #include <jubatus/client.hpp>
 
+
 using namespace std;
+/*
 using std::make_pair;
 using std::pair;
 using std::string;
 using std::vector;
 using jubatus::classifier::datum;
 using jubatus::classifier::estimate_result;
-
+*/
+using jubatus::classifier::client::classifier;
 
 class User{
 public:
@@ -53,13 +56,15 @@ public:
 
 class Uba{
 public:
-	jubatus::classifier::client::classifier *client;
 	unsigned int counter,jubacounter,vyatta_counter;
 	string before_timestamp;
 	vector<UrlAction> url_action_list;
 	vector<User> user_list;
 	map<string,string> record_map;
    map<string,string>::iterator mit;
+	
+	//jubatus::classifier::client::classifier *client;
+	classifier *jubatus_classifier;
 	void count(){counter++;}
 	void Proc();
 	//Jubatus

@@ -55,5 +55,19 @@ using namespace std;
 #include <pqxx/pqxx>
 #endif
 
+
+/*
+#include <jubatus/client.hpp>
+using std::make_pair;
+using std::pair;
+using std::string;
+using std::vector;
+using jubatus::classifier::datum;
+using jubatus::classifier::estimate_result;
+
+*/
+
+
+
 #include "Color.H"
 #include "Debug.H"

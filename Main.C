@@ -52,6 +52,7 @@ if(argc != 2){
 	observer = new Observer;
 	gzip = new Gzip;
 	file_writer = new FileWriter;
+	//jubatus_classifier = new jubatus::classifier::client::classifier("localhost",9199,1.0);
 	uba = new Uba(); 
 #ifdef USE_POSTGRES
 	pgsql = new Pgsql;

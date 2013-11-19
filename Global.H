@@ -110,3 +110,5 @@ extern Packet* sss_send_value;
 
 class Uba;
 extern Uba *uba;	//---------------->routerman
+//extern jubatus::classifier::client::classifier *jubatus_classifier;
+
