@@ -9,15 +9,14 @@
 
 
 using namespace std;
-/*
+
 using std::make_pair;
 using std::pair;
 using std::string;
 using std::vector;
 using jubatus::classifier::datum;
 using jubatus::classifier::estimate_result;
-*/
-using jubatus::classifier::client::classifier;
+//using jubatus::classifier::client::classifier;
 
 class User{
 public:
@@ -63,8 +62,7 @@ public:
 	map<string,string> record_map;
    map<string,string>::iterator mit;
 	
-	//jubatus::classifier::client::classifier *client;
-	classifier *jubatus_classifier;
+	jubatus::classifier::client::classifier *jubatus_classifier;
 	void count(){counter++;}
 	void Proc();
 	//Jubatus

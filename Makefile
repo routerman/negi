@@ -22,7 +22,12 @@ CC=g++
 OPT=-Wall -g
 INC=
 #LIB=-lpqxx -lpcap -pthread -lboost_thread -lz
-LIB=-lpqxx -lpcap -lz
+
+
+#LIB=-lpqxx -lpcap -lz
+LIB=-lpqxx -lpcap -lz `pkg-config pficommon --libs --cflags` -lmsgpack -ljubatus_mpio -ljubatus_msgpack-rpc
+
+
 #LIB= -pthread -lpcap -lz
 
 #------------------------------------------------------

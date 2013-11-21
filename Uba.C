@@ -122,8 +122,9 @@ datum Uba::make_datum(const string& hair, const string& top, const string& botto
 /* initiation of jubaclassifier */
 void Uba::InitJubatus(){
 	//初めにjubaclassifierに学習させる。
-	//jubatus_classifier = new classifier("localhost",9199,1.0);	
+	jubatus_classifier = new jubatus::classifier::client::classifier("localhost",9199,1.0);
 	RED cout<<"Uba::InitJubatus() start!"<<endl;	RESET
+/*
 	try{
 		connection *conn = pgsql->GetConn();
 		work T(*conn);
@@ -145,6 +146,7 @@ void Uba::InitJubatus(){
 	catch(...){
 		cerr << "routerman >> unhandled error!! :)" << endl;
 	}
+*/
 	RED cout<<"Uba::InitJubatus() end" <<endl; RESET
 }
 
