@@ -4,6 +4,7 @@
 #include "Include.H"
 #include "Packet.H"
 #include "Global.H"
+
 //#include "/opt/jubatus/include/jubatus/client.hpp"
 #include <jubatus/client.hpp>
 
@@ -56,7 +57,14 @@ public:
 class Uba{
 public:
 	unsigned int counter,jubacounter,vyatta_counter;
+
+
 	string before_timestamp;
+	//struct tm before_timestamp;
+	// before_timestamp;
+
+
+
 	vector<UrlAction> url_action_list;
 	vector<User> user_list;
 	map<string,string> record_map;

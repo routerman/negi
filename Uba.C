@@ -8,7 +8,16 @@ void Uba::Proc(){
 			connection *conn = pgsql->GetConn();
 			work T(*conn);
 			result *result_list;
-			result_list = new result( T.exec("select src_ip,dst_ip,pattern,result,timestamp from save_result where pattern like 'POST'") );
+			result_list = new result( T.exec("select src_ip,dst_ip,pattern,result from save_result where pattern like 'POST' and timestamp>'"+ before_timestamp +"'" ) );
+
+			time_t timer;
+			time(&timer);
+			struct tm *tmp = localtime(&timer);
+			ostringstream oss;
+			oss << tmp->tm_year+1900 <<"-"<< tmp->tm_mon+1 <<"-"<<tmp->tm_mday <<" "<<tmp->tm_hour<<":"<<tmp->tm_min<<":"<<tmp->tm_sec;
+			before_timestamp = oss.str();
+
+
 			//T.commit();
 			for( result::const_iterator it = result_list->begin(); it != result_list->end(); ++it ){
 				//cout << "src_ip =" << it[0].as( string() ) << ": pattern=" << it[1].as( string() ) << ": result =" << it[2].as( string() ) << endl;
@@ -39,9 +48,6 @@ void Uba::Proc(){
 							break;
 						}
 					}
-				}
-				if( it==result_list->end() ){
-					before_timestamp = it[4].as( string() );
 				}
 			}
 			T.commit();
@@ -80,23 +86,23 @@ void Uba::InitUrlActionList(){
 }
 
 Uba::Uba(){
-	//char ctstamp[32];
-	//struct timeval tmp_time = ;
-	//strftime(ctstamp,32,"%Y-%m-%d %H:%M:%S", (const struct tm *)localtime(&tmp_time.tv_sec) );
-	//before_timestamp = ctstamp;
-/*
-	before_timestamp="";
+	/*
 	connection *conn = pgsql->GetConn();
 	work T(*conn);
 	result res( T.exec("select CURRENT_TIMESTAMP(0)") );
-	result::const_iterator it = res.begin();
-	before_timestamp=it;
+	result::const_iterator c = res.begin();
+	before_timestamp = c[0].as( time_t() );
 	T.commit();
+	cout << before_timestamp << endl;
 */
-	//client = new jubatus::classifier::client::classifier("localhost",9199,1.0);
 
-	before_timestamp="";
-	//strptime(,,);
+	time_t timer;
+	time(&timer);
+	struct tm *tmp = localtime(&timer);
+	ostringstream oss;
+	oss << tmp->tm_year+1900 <<"-"<< tmp->tm_mon+1 <<"-"<<tmp->tm_mday <<" "<<tmp->tm_hour<<":"<<tmp->tm_min<<":"<<tmp->tm_sec;
+	before_timestamp = oss.str();
+
 	counter=0;
 	jubacounter=0;
 	vyatta_counter=0;
@@ -119,6 +125,7 @@ void Uba::InitJubatus(){
 	jubatus_classifier = new jubatus::classifier::client::classifier("localhost",9199,1.0);
 	RED cout<<"Uba::InitJubatus() start!"<<endl;	RESET
 	try{
+		/*
 		connection *conn = pgsql->GetConn();
 		work T(*conn);
 		result *result_list;
@@ -128,10 +135,15 @@ void Uba::InitJubatus(){
 			//NOP yet..
 			//T.exec( "update user_shop_actions set " + jt->action + "=" + jt->action + "+1 where src_ip='10.24.129.200' and host='"+ host +"'");
 		}
-		//vector<pair<string, datum> > train_data;
-		//train_data.push_back(make_pair("Good",make_datum(10,10,10)));
-		//train_data.push_back(make_pair("Good",make_datum(10,10,10)));
-		//client.train("test",train_data);
+		*/
+		vector<pair<string, datum> > train_data;
+		train_data.push_back(make_pair("Good",make_datum(50,10,5)));
+		train_data.push_back(make_pair("Bad", make_datum(80,4,0)));
+		train_data.push_back(make_pair("Good",make_datum(50,10,10)));
+		train_data.push_back(make_pair("New", make_datum(20,2,0)));
+		jubatus_classifier->train("test",train_data);
+
+
 	}catch(const exception &e){
 		cerr << e.what() << endl;
 	}catch(...){
@@ -148,6 +160,7 @@ void Uba::JubatusProc(){
 		RED cout<<"Uba::jubatus_test() start()!"<<endl;	RESET
 		jubacounter=0;
 		try{
+			/*
 			connection *conn = pgsql->GetConn();
 			work T(*conn);
 			result *result_list;
@@ -160,6 +173,20 @@ void Uba::JubatusProc(){
 				//T.exec( "update user_shop_actions set " + jt->action + "=" + jt->action + "+1 where src_ip='10.24.129.200' and host='"+ host +"'");
 			}
 			T.commit();
+			*/
+			vector<datum> test_data;
+			test_data.push_back(make_datum(200,2,0));
+			test_data.push_back(make_datum(30,15,10));
+
+			vector<vector<estimate_result> > results = jubatus_classifier->classify("test", test_data);
+			for (size_t i = 0; i < results.size(); ++i) {
+				for (size_t j = 0; j < results[i].size(); ++j) {
+					const estimate_result& r = results[i][j];
+					std::cout << r.label << " " << r.score << std::endl;
+				}
+				std::cout << std::endl;
+			}
+
 		}catch(const exception &e){
 			cerr << e.what() << endl;
 		}catch(...){
