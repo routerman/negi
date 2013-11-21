@@ -52,8 +52,6 @@ if(argc != 2){
 	observer = new Observer;
 	gzip = new Gzip;
 	file_writer = new FileWriter;
-	//jubatus_classifier = new jubatus::classifier::client::classifier("localhost",9199,1.0);
-	uba = new Uba(); 
 #ifdef USE_POSTGRES
 	pgsql = new Pgsql;
 	pgsql_saver = new PgsqlSaver;
@@ -65,6 +63,7 @@ if(argc != 2){
 	rule_loader_file = new RuleLoaderFile;
 	rule_loader_file->Proc();
 #endif
+	uba = new Uba(); //------------------>routerman add
 
 	rule_pool->ShowRules();
 

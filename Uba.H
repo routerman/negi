@@ -67,6 +67,7 @@ public:
 	void Proc();
 	//Jubatus
 	void JubatusProc();
+	datum make_datum(int access_month, int cart, int buy);
 
 	//vyatta
 	void VyattaProc();

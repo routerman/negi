@@ -46,11 +46,9 @@ void Uba::Proc(){
 			}
 			T.commit();
 			//conn->disconnect();
-		}
-		catch(const exception &e){
+		}catch(const exception &e){
 			cerr << e.what() << endl;
-		}
-		catch(...){
+		}catch(...){
 			cerr << "routerman >> unhandled error!! :)" << endl;
 		}
 		JubatusProc();
@@ -107,24 +105,19 @@ Uba::Uba(){
 	InitJubatus();
 }
 
-/*
-datum Uba::make_datum(const string& hair, const string& top, const string& bottom, double height) {
-  datum d;
-  d.string_values.push_back(make_pair("hair", hair));
-  d.string_values.push_back(make_pair("top", top));
-  d.string_values.push_back(make_pair("bottom", bottom));
 
-  d.num_values.push_back(make_pair("height", height));
+datum Uba::make_datum(int access_month, int cart, int buy) {
+  datum d;
+  d.num_values.push_back(make_pair("access_month", access_month));
+  d.num_values.push_back(make_pair("cart", cart));
+  d.num_values.push_back(make_pair("buy", buy));
   return d;
 }
-*/
 
 /* initiation of jubaclassifier */
 void Uba::InitJubatus(){
-	//初めにjubaclassifierに学習させる。
 	jubatus_classifier = new jubatus::classifier::client::classifier("localhost",9199,1.0);
 	RED cout<<"Uba::InitJubatus() start!"<<endl;	RESET
-/*
 	try{
 		connection *conn = pgsql->GetConn();
 		work T(*conn);
@@ -139,22 +132,17 @@ void Uba::InitJubatus(){
 		//train_data.push_back(make_pair("Good",make_datum(10,10,10)));
 		//train_data.push_back(make_pair("Good",make_datum(10,10,10)));
 		//client.train("test",train_data);
-	}
-	catch(const exception &e){
+	}catch(const exception &e){
 		cerr << e.what() << endl;
-	}
-	catch(...){
+	}catch(...){
 		cerr << "routerman >> unhandled error!! :)" << endl;
 	}
-*/
 	RED cout<<"Uba::InitJubatus() end" <<endl; RESET
 }
 
 /* jubaclassifier classifies user */
 void Uba::JubatusProc(){
-	//jubatus::classifier::client::classifier client("localhost",9199,1.0);
-	//定期的にuserテーブルにuser情報を問い合わせ、jubatusに分類してもらう。
-	//結果をもとにvyattaAPIをた
+	//定期的にuserテーブルにuser情報を問い合わせ、jubatusに分類して、スコアを基にuser_shop_actionsのユーザタイプを更新する。
 	jubacounter++;
 	if(jubacounter>=2){
 		RED cout<<"Uba::jubatus_test() start()!"<<endl;	RESET
@@ -172,11 +160,9 @@ void Uba::JubatusProc(){
 				//T.exec( "update user_shop_actions set " + jt->action + "=" + jt->action + "+1 where src_ip='10.24.129.200' and host='"+ host +"'");
 			}
 			T.commit();
-		}
-		catch(const exception &e){
+		}catch(const exception &e){
 			cerr << e.what() << endl;
-		}
-		catch(...){
+		}catch(...){
 			cerr << "routerman >> unhandled error!! :)" << endl;
 		}
 		VyattaProc();
@@ -184,8 +170,8 @@ void Uba::JubatusProc(){
 	}
 }
 
+//user_shop_actionsテーブルに問い合わせ、全てのGoodユーザのソースIPに対して静的ルーティングをする。
 void Uba::VyattaProc(){
-	//結果をもとにvyattaAPIをた
 	vyatta_counter++;
 	if(vyatta_counter>=1){
 		RED cout<<"Uba::VyattaConfig start()!"<<endl;	RESET
@@ -195,17 +181,14 @@ void Uba::VyattaProc(){
 			work T(*conn);
 			result *result_list;
 			result_list = new result( T.exec("select src_ip from user_shop_actions where class='Good'") );
-			//NOP yet..
 			for( result::const_iterator it = result_list->begin(); it != result_list->end(); ++it ){
-				//vyattaAPI
+				//ここでvyattaAPIをたたき、各GoodユーザのソースIPの次ホップを高品質サーバ行きに
 				//cli_config_api("set protocols static route "+ it[0].as( string() )  +" next-hop 0.0.0.0");
 			}
 			T.commit();
-		}
-		catch(const exception &e){
+		}catch(const exception &e){
 			cerr << e.what() << endl;
-		}
-		catch(...){
+		}catch(...){
 			cerr << "routerman >> unhandled error!! :)" << endl;
 		}
 		RED cout<<"Uba::VyattaConfig() end" <<endl; RESET
