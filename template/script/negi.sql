@@ -312,7 +312,8 @@ CREATE TABLE user_shop_actions(
 	 access_time_month integer,
     cart integer,
     buy integer,
-    class text
+    class text,
+	 train_flag integer
 );
 
 ALTER TABLE public.user_shop_actions OWNER TO postgres;
