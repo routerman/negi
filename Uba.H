@@ -15,9 +15,17 @@ using std::make_pair;
 using std::pair;
 using std::string;
 using std::vector;
-using jubatus::classifier::datum;
+
+
+//using jubatus::classifier::datum;
+//using jubatus::classifier::estimate_result;
+
+//For client 0.5
+using jubatus::client::common::datum;
 using jubatus::classifier::estimate_result;
-//using jubatus::classifier::client::classifier;
+using jubatus::classifier::labeled_datum;
+
+
 
 class User{
 public:
@@ -56,15 +64,9 @@ public:
 
 class Uba{
 public:
-	unsigned int counter,jubacounter,vyatta_counter;
-
+	unsigned int counter,jubatus_counter,vyatta_counter;
 
 	string before_timestamp;
-	//struct tm before_timestamp;
-	// before_timestamp;
-
-
-
 	vector<UrlAction> url_action_list;
 	vector<User> user_list;
 	map<string,string> record_map;

@@ -107,7 +107,7 @@ Uba::Uba(){
 		cerr << "routerman >> unhandled error!! :)" << endl;
 	}
 	counter=0;
-	jubacounter=0;
+	jubatus_counter=0;
 	vyatta_counter=0;
 	InitRecordList();
 	InitUrlActionList();
@@ -124,7 +124,7 @@ datum Uba::make_datum(int access_month, int cart, int buy) {
 
 /* initiation of jubaclassifier */
 void Uba::InitJubatus(){
-	jubatus_classifier = new jubatus::classifier::client::classifier("localhost",9199,1.0);
+	jubatus_classifier = new jubatus::classifier::client::classifier("localhost",9199,"test",1.0);
 	RED cout<<"Uba::InitJubatus() start!"<<endl;	RESET
 	try{
 		connection *conn = pgsql->GetConn();
@@ -132,15 +132,16 @@ void Uba::InitJubatus(){
 		result *result_list;
 		result_list = new result( T.exec("select class,access_month,cart,buy from user_shop_actions where train_flag=1") );
 		T.commit();
-		vector<pair<string, datum> > train_data;
+
+		vector<labeled_datum> train_data;
 		for( result::const_iterator c = result_list->begin(); c != result_list->end(); c++ ){
-			train_data.push_back( make_pair( c[0].as(string()), make_datum( c[1].as(int()), c[2].as(int()), c[3].as(int()) ) ) );
+			train_data.push_back( labeled_datum( c[0].as(string()), make_datum( c[1].as(int()), c[2].as(int()), c[3].as(int()) ) ) );
 		}
-		train_data.push_back(make_pair("Good",make_datum(50,10,5)));
-		train_data.push_back(make_pair("Bad", make_datum(80,4,0)));
-		train_data.push_back(make_pair("Good",make_datum(50,10,10)));
-		train_data.push_back(make_pair("New", make_datum(20,2,0)));
-		jubatus_classifier->train("test",train_data);
+		train_data.push_back(labeled_datum("Good",make_datum(50,10, 5)));
+		train_data.push_back(labeled_datum("Bad", make_datum(80, 4, 0)));
+		train_data.push_back(labeled_datum("Good",make_datum(50,10,10)));
+		train_data.push_back(labeled_datum("New", make_datum(20, 2, 0)));
+		jubatus_classifier->train(train_data);
 	}catch(const exception &e){
 		cerr << e.what() << endl;
 	}catch(...){
@@ -152,10 +153,10 @@ void Uba::InitJubatus(){
 /* jubaclassifier classifies user */
 void Uba::JubatusProc(){
 	//定期的にuserテーブルにuser情報を問い合わせ、jubatusに分類して、スコアを基にuser_shop_actionsのユーザタイプを更新する。
-	jubacounter++;
-	if(jubacounter>=2){
+	jubatus_counter++;
+	if(jubatus_counter>=2){
 		RED cout<<"Uba::jubatus_test() start()!"<<endl;	RESET
-		jubacounter=0;
+		jubatus_counter=0;
 		try{
 			connection *conn = pgsql->GetConn();
 			work T(*conn);
@@ -170,7 +171,7 @@ void Uba::JubatusProc(){
 			test_data.push_back(make_datum(200,2,0));
 			test_data.push_back(make_datum(30,15,10));
 
-			vector<vector<estimate_result> > results = jubatus_classifier->classify("test", test_data);
+			vector<vector<estimate_result> > results = jubatus_classifier->classify(test_data);
 			for (size_t i = 0; i < results.size(); ++i) {
 				for (size_t j = 0; j < results[i].size(); ++j) {
 					const estimate_result& r = results[i][j];
