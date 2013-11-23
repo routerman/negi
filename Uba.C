@@ -116,9 +116,9 @@ Uba::Uba(){
 
 datum Uba::make_datum(int access_month, int cart, int buy) {
 	datum d;
-	d.num_values.push_back(make_pair("access_month", access_month));
-	d.num_values.push_back(make_pair("cart", cart));
-	d.num_values.push_back(make_pair("buy", buy));
+	d.add_number("access_month", access_month);
+	d.add_number("cart", cart);
+	d.add_number("buy", buy);
 	return d;
 }
 
