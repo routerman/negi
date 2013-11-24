@@ -15,12 +15,12 @@ if [ $# -ne 2 ]; then
   echo "./install (username) (databasename)"
   exit 1
 fi
+echo "deb http://ftp.jp.debian.org/debian/ squeeze main" >> /etc/apt/sources.list #PostgreSQL8.4
+echo "deb http://download.jubat.us/apt binary/" >> /etc/apt/sources.list.d/jubatus.list #jubatus 0.4.5
 apt-get update
-apt-get install aptitude -y
-echo "deb http://ftp.jp.debian.org/debian/ squeeze main" >> /etc/apt/sources.list
-echo "deb http://download.jubat.us/apt binary/" >> /etc/apt/sources.list.d/jubatus.list
+apt-get install aptitude jubatus=0.4* -y
 aptitude update
-aptitude install git g++ libboost-dev libpqxx3-dev zlib1g-dev libpcap-dev libboost-all-dev postgresql-8.4 phppgadmin build-essential jubatus -y
+aptitude install git g++ libboost-dev libpqxx3-dev zlib1g-dev libpcap-dev libboost-all-dev postgresql-8.4 phppgadmin build-essential -y
 
 . /opt/jubatus/profile
 
