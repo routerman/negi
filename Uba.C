@@ -54,7 +54,7 @@ void Uba::Proc(){
 		}catch(...){
 			cerr << "routerman >> unhandled error!! :)" << endl;
 		}	
-		JubatusProc();
+		jubatus_client.Proc();
 		RED cout<<"Uba::Proc() end" <<endl; RESET
 	}
 }
@@ -111,10 +111,36 @@ Uba::Uba(){
 	vyatta_counter=0;
 	InitRecordList();
 	InitUrlActionList();
-	InitJubatus();
 }
 
-datum Uba::make_datum(int access_month, int cart, int buy) {
+//user_shop_actionsテーブルに問い合わせ、全てのGoodユーザのソースIPに対して静的ルーティングをする。
+void Uba::VyattaProc(){
+	vyatta_counter++;
+	if(vyatta_counter>=1){
+		RED cout<<"Uba::VyattaConfig start()!"<<endl;	RESET
+		vyatta_counter=0;
+		try{
+			connection *conn = pgsql->GetConn();
+			work T(*conn);
+			result *result_list;
+			result_list = new result( T.exec("select src_ip from user_shop_actions where class='Good'") );
+			for( result::const_iterator it = result_list->begin(); it != result_list->end(); ++it ){
+				//ここでvyattaAPIをたたき、各GoodユーザのソースIPの次ホップを高品質サーバ行きに
+				//cli_config_api("set protocols static route "+ it[0].as( string() )  +" next-hop 0.0.0.0");
+			}
+			T.commit();
+		}catch(const exception &e){
+			cerr << e.what() << endl;
+		}catch(...){
+			cerr << "routerman >> unhandled error!! :)" << endl;
+		}
+		RED cout<<"Uba::VyattaConfig() end" <<endl; RESET
+	}
+}
+
+
+/* JubatusClient */
+datum JubatusClient::make_datum(int access_month, int cart, int buy) {
 	datum d;
 	d.num_values.push_back(make_pair("access_month", access_month));
 	d.num_values.push_back(make_pair("cart", cart));
@@ -123,36 +149,9 @@ datum Uba::make_datum(int access_month, int cart, int buy) {
 }
 
 /* initiation of jubaclassifier */
-void Uba::InitJubatus(){
-	jubatus_classifier = new jubatus::classifier::client::classifier("localhost",9199,1.0);
-	RED cout<<"Uba::InitJubatus() start!"<<endl;	RESET
-	try{
-		connection *conn = pgsql->GetConn();
-		work T(*conn);
-		result *result_list;
-		result_list = new result( T.exec("select class,access_month,cart,buy from user_shop_actions where train_flag=1") );
-		T.commit();
-		vector<pair<string, datum> > train_data;
-		for( result::const_iterator c = result_list->begin(); c != result_list->end(); c++ ){
-			train_data.push_back( make_pair( c[0].as(string()), make_datum( c[1].as(int()), c[2].as(int()), c[3].as(int()) ) ) );
-		}
-		train_data.push_back(make_pair("Good",make_datum(50,10,5)));
-		train_data.push_back(make_pair("Bad", make_datum(80,4,0)));
-		train_data.push_back(make_pair("Good",make_datum(50,10,10)));
-		train_data.push_back(make_pair("New", make_datum(20,2,0)));
-		jubatus_classifier->train("test",train_data);
-	}catch(const exception &e){
-		cerr << e.what() << endl;
-	}catch(...){
-		cerr << "routerman >> unhandled error!! :)" << endl;
-	}
-	RED cout<<"Uba::InitJubatus() end" <<endl; RESET
-}
-
-/* jubaclassifier classifies user */
-void Uba::JubatusProc(){
+void JubatusClient::Proc(){
 	//定期的にuserテーブルにuser情報を問い合わせ、jubatusに分類して、スコアを基にuser_shop_actionsのユーザタイプを更新する。
-	jubacounter++;
+	counter++;
 	if(jubacounter>=2){
 		RED cout<<"Uba::jubatus_test() start()!"<<endl;	RESET
 		jubacounter=0;
@@ -184,32 +183,35 @@ void Uba::JubatusProc(){
 		}catch(...){
 			cerr << "routerman >> unhandled error!! :)" << endl;
 		}
-		VyattaProc();
+		//VyattaProc();
 		RED cout<<"Uba::jubatus_test() end" <<endl; RESET
 	}
+//user_shop_actionsテーブルに問い合わせ、全てのGoodユーザのソースIPに対して静的ルーティングをする。
 }
 
-//user_shop_actionsテーブルに問い合わせ、全てのGoodユーザのソースIPに対して静的ルーティングをする。
-void Uba::VyattaProc(){
-	vyatta_counter++;
-	if(vyatta_counter>=1){
-		RED cout<<"Uba::VyattaConfig start()!"<<endl;	RESET
-		vyatta_counter=0;
-		try{
-			connection *conn = pgsql->GetConn();
-			work T(*conn);
-			result *result_list;
-			result_list = new result( T.exec("select src_ip from user_shop_actions where class='Good'") );
-			for( result::const_iterator it = result_list->begin(); it != result_list->end(); ++it ){
-				//ここでvyattaAPIをたたき、各GoodユーザのソースIPの次ホップを高品質サーバ行きに
-				//cli_config_api("set protocols static route "+ it[0].as( string() )  +" next-hop 0.0.0.0");
-			}
-			T.commit();
-		}catch(const exception &e){
-			cerr << e.what() << endl;
-		}catch(...){
-			cerr << "routerman >> unhandled error!! :)" << endl;
+JubatusClient::JubatusClient(){
+	jubatus_classifier = new jubatus::classifier::client::classifier("localhost",9199,1.0);
+	RED cout<<"JubatusClient::JubatusClient() start!"<<endl;	RESET
+	try{
+		connection *conn = pgsql->GetConn();
+		work T(*conn);
+		result *result_list;
+		result_list = new result( T.exec("select class,access_month,cart,buy from user_shop_actions where train_flag=1") );
+		T.commit();
+		vector<pair<string, datum> > train_data;
+		for( result::const_iterator c = result_list->begin(); c != result_list->end(); c++ ){
+			train_data.push_back( make_pair( c[0].as(string()), make_datum( c[1].as(int()), c[2].as(int()), c[3].as(int()) ) ) );
 		}
-		RED cout<<"Uba::VyattaConfig() end" <<endl; RESET
+		train_data.push_back(make_pair("Good",make_datum(50,10,5)));
+		train_data.push_back(make_pair("Bad", make_datum(80,4,0)));
+		train_data.push_back(make_pair("Good",make_datum(50,10,10)));
+		train_data.push_back(make_pair("New", make_datum(20,2,0)));
+		jubatus_classifier->train("test",train_data);
+	}catch(const exception &e){
+		cerr << e.what() << endl;
+	}catch(...){
+		cerr << "routerman >> unhandled error!! :)" << endl;
 	}
+	RED cout<<"JubatusClient::JubatusClient() start!"<<endl;	RESET
 }
+

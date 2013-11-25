@@ -54,35 +54,32 @@ public:
 	}
 };
 
+
+class JubatusClient{
+public:
+	counter;
+	jubatus::classifier::client::classifier *jubatus_classifier;
+	datum make_datum(int access_month, int cart, int buy);
+	void Proc();
+	JubatusClient();
+};
+
 class Uba{
 public:
+	JubatusClient jubatus_client;
 	unsigned int counter,jubacounter,vyatta_counter;
-
-
 	string before_timestamp;
-	//struct tm before_timestamp;
-	// before_timestamp;
-
-
-
 	vector<UrlAction> url_action_list;
 	vector<User> user_list;
 	map<string,string> record_map;
    map<string,string>::iterator mit;
-	
-	jubatus::classifier::client::classifier *jubatus_classifier;
 	void count(){counter++;}
 	void Proc();
-	//Jubatus
-	void JubatusProc();
-	datum make_datum(int access_month, int cart, int buy);
-
 	//vyatta
 	void VyattaProc();
 	//Initiation	
 	void InitRecordList();
 	void InitUrlActionList();
-	void InitJubatus();
 	Uba();
 };
 
