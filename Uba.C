@@ -34,15 +34,7 @@ void Uba::InitRecordList(){
 			record_map.insert( make_pair( c[0].as(string()), c[1].as(string()) ) );
 			RED cout<< "dst_ip=" <<c[0].as(string())<<" : host= "<< c[1].as(string()) <<endl; RESET
 		}
-		//record_map.insert(make_pair("",""));
-		//record_map.insert(make_pair("54.240.248.0"   ,"www.amazon.co.jp"));
-		//record_map.insert(make_pair("202.72.50.10"   ,"www.rakuten.co.jp"));
-		//record_map.insert(make_pair("202.32.114.47"  ,"www.nitori-net.jp"));
-		//record_map.insert(make_pair("210.129.151.129","kakaku.com"));
-		//record_map.insert(make_pair("202.247.10.161" ,"www.takashimaya.co.jp"));
-		//record_map.insert(make_pair("69.171.229.25"  ,"www.facebook.com"));
 		//record_map.insert(make_pair("203.216.231.189","www.yahoo.co.jp"));
-		//record_map.insert(make_pair("*","not found!"));
 	}catch(const exception &e){
 		cerr << e.what() << endl;
 	}catch(...){
@@ -131,6 +123,7 @@ void Uba::Proc(){
 			cerr << "routerman >> unhandled error!! :)" << endl;
 		}	
 		user_classifier->Proc();
+		VyattaProc();
 		RED cout<<"Uba::Proc() end" <<endl; RESET
 	}
 }
@@ -139,7 +132,7 @@ void Uba::Proc(){
 void Uba::VyattaProc(){
 	vyatta_count++;
 	if(vyatta_count>=1){
-		RED cout<<"Uba::VyattaConfig start()!"<<endl;	RESET
+		RED cout<<"Uba::VyattaConfig start()!  vyataaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"<<endl;	RESET
 		vyatta_count=0;
 		try{
 			connection *conn = pgsql->GetConn();
@@ -150,6 +143,13 @@ void Uba::VyattaProc(){
 				//ここでvyattaAPIをたたき、各GoodユーザのソースIPの次ホップを高品質サーバ行きに
 				//cli_config_api("set protocols static route "+ it[0].as( string() )  +" next-hop 0.0.0.0");
 			}
+			RED
+			char *const args[] = {
+				"/bin/echo",
+				"abc"
+			};
+			execvp(args[0],args);
+			RESET
 			T.commit();
 		}catch(const exception &e){
 			cerr << e.what() << endl;

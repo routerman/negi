@@ -39,7 +39,7 @@ void UserClassifier::Proc(){
 	//定期的にuserテーブルにuser情報を問い合わせ、jubatusに分類して、スコアを基にuser_shop_actionsのユーザタイプを更新する。
 	count++;
 	if(count>=2){
-		RED cout<<"UserClassifier::Proc() start!"<<endl;	RESET
+		RED cout<<"UserClassifier::Proc() staaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaart!"<<endl;	RESET
 		count=0;
 		try{
 			connection *conn = pgsql->GetConn();
