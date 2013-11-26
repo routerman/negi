@@ -1,9 +1,85 @@
 #include"Uba.H"
 
+Uba::Uba(){
+	RED cout<<"Uba::Uba() start!"<<endl; RESET
+	try{
+		connection *conn = pgsql->GetConn();
+		work T(*conn);
+		result res( T.exec("select CURRENT_TIMESTAMP(0) AT TIME ZONE 'JST'") );
+		result::const_iterator c = res.begin();
+		before_timestamp = c[0].as( string() );
+		T.commit();
+		cout << before_timestamp << endl;
+	}catch(const exception &e){
+		cerr << e.what() << endl;
+	}catch(...){
+		cerr << "routerman >> unhandled error!! :)" << endl;
+	}
+	count=vyatta_count=0;
+	InitRecordList();
+	InitUrlActionList();
+	RED cout<<"Uba::Uba() stop!"<<endl; RESET
+}
+
+//DNS
+void Uba::InitRecordList(){
+	RED cout<<"Uba::InitRecordList start!"<<endl;	RESET
+	try{
+		connection *conn = pgsql->GetConn();
+		work T(*conn);
+		result *result_list;
+		result_list = new result( T.exec("select dst_ip,host from dns") );
+		T.commit();
+		for( result::const_iterator c = result_list->begin(); c != result_list->end(); c++ ){
+			record_map.insert( make_pair( c[0].as(string()), c[1].as(string()) ) );
+			RED cout<< "dst_ip=" <<c[0].as(string())<<" : host= "<< c[1].as(string()) <<endl; RESET
+		}
+		//record_map.insert(make_pair("",""));
+		//record_map.insert(make_pair("54.240.248.0"   ,"www.amazon.co.jp"));
+		//record_map.insert(make_pair("202.72.50.10"   ,"www.rakuten.co.jp"));
+		//record_map.insert(make_pair("202.32.114.47"  ,"www.nitori-net.jp"));
+		//record_map.insert(make_pair("210.129.151.129","kakaku.com"));
+		//record_map.insert(make_pair("202.247.10.161" ,"www.takashimaya.co.jp"));
+		//record_map.insert(make_pair("69.171.229.25"  ,"www.facebook.com"));
+		//record_map.insert(make_pair("203.216.231.189","www.yahoo.co.jp"));
+		//record_map.insert(make_pair("*","not found!"));
+	}catch(const exception &e){
+		cerr << e.what() << endl;
+	}catch(...){
+		cerr << "routerman >> unhandled error!! :)" << endl;
+	}
+	RED cout<<"Uba::InitRecordList stop!"<<endl;	RESET
+}
+
+//
+void Uba::InitUrlActionList(){
+	RED cout<<"Uba::InitUrlActionList() start!"<<endl;	RESET
+	try{
+		connection *conn = pgsql->GetConn();
+		work T(*conn);
+		result *result_list;
+		result_list = new result( T.exec("select url,host,action from url_action") );
+		T.commit();
+
+		UrlAction *tmp;
+		for( result::const_iterator c = result_list->begin(); c != result_list->end(); c++ ){
+			tmp = new UrlAction( c[0].as(string()), c[1].as(string()), c[2].as(string()) );
+			//tmp = new UrlAction("/shop/cart/cart.aspx","www.nitori-net.jp","cart");
+			url_action_list.push_back(*tmp);
+		}
+	}catch(const exception &e){
+		cerr << e.what() << endl;
+	}catch(...){
+		cerr << "routerman >> unhandled error!!" << endl;
+	}
+	RED cout<<"Uba::InitUrlActionList() stop!"<<endl;	RESET
+}
+
+
 void Uba::Proc(){
-	if(counter>10){
+	if(count>10){
 		RED cout<<"Uba::Proc() start"<<endl; RESET
-		counter=0;
+		count=0;
 		try{
 			connection *conn = pgsql->GetConn();			
 			work T(*conn);
@@ -54,71 +130,17 @@ void Uba::Proc(){
 		}catch(...){
 			cerr << "routerman >> unhandled error!! :)" << endl;
 		}	
-		jubatus_client.Proc();
+		user_classifier->Proc();
 		RED cout<<"Uba::Proc() end" <<endl; RESET
 	}
 }
 
-void Uba::InitRecordList(){
-	RED cout<<"Uba::InitRecordList) start!"<<endl;	RESET
-	try{
-		connection *conn = pgsql->GetConn();
-		work T(*conn);
-		result *result_list;
-		result_list = new result( T.exec("select dst_ip,host from dns") );
-		T.commit();
-		for( result::const_iterator c = result_list->begin(); c != result_list->end(); c++ ){
-			record_map.insert( make_pair( c[0].as(string()), c[1].as(string()) ) );
-		}
-		//record_map.insert(make_pair("",""));
-		record_map.insert(make_pair("54.240.248.0"   ,"www.amazon.co.jp"));
-		record_map.insert(make_pair("202.72.50.10"   ,"www.rakuten.co.jp"));
-		record_map.insert(make_pair("202.32.114.47"  ,"www.nitori-net.jp"));
-		record_map.insert(make_pair("210.129.151.129","kakaku.com"));
-		record_map.insert(make_pair("202.247.10.161" ,"www.takashimaya.co.jp"));
-		record_map.insert(make_pair("69.171.229.25"  ,"www.facebook.com"));
-		record_map.insert(make_pair("203.216.231.189","www.yahoo.co.jp"));
-		record_map.insert(make_pair("*","not found!"));
-	}catch(const exception &e){
-		cerr << e.what() << endl;
-	}catch(...){
-		cerr << "routerman >> unhandled error!! :)" << endl;
-	}
-}
-
-void Uba::InitUrlActionList(){
-	UrlAction *tmp;
-	tmp = new UrlAction("/shop/cart/cart.aspx","www.nitori-net.jp","cart");
-	url_action_list.push_back(*tmp);
-}
-
-Uba::Uba(){
-	try{
-		connection *conn = pgsql->GetConn();
-		work T(*conn);
-		result res( T.exec("select CURRENT_TIMESTAMP(0) AT TIME ZONE 'JST'") );
-		result::const_iterator c = res.begin();
-		before_timestamp = c[0].as( string() );
-		T.commit();
-		cout << before_timestamp << endl;
-	}catch(const exception &e){
-		cerr << e.what() << endl;
-	}catch(...){
-		cerr << "routerman >> unhandled error!! :)" << endl;
-	}
-	counter=0;
-	jubacounter=0;
-	vyatta_counter=0;
-	InitRecordList();
-	InitUrlActionList();
-}
-
 //user_shop_actionsテーブルに問い合わせ、全てのGoodユーザのソースIPに対して静的ルーティングをする。
 void Uba::VyattaProc(){
-	vyatta_counter++;
-	if(vyatta_counter>=1){
+	vyatta_count++;
+	if(vyatta_count>=1){
 		RED cout<<"Uba::VyattaConfig start()!"<<endl;	RESET
-		vyatta_counter=0;
+		vyatta_count=0;
 		try{
 			connection *conn = pgsql->GetConn();
 			work T(*conn);
@@ -136,82 +158,5 @@ void Uba::VyattaProc(){
 		}
 		RED cout<<"Uba::VyattaConfig() end" <<endl; RESET
 	}
-}
-
-
-/* JubatusClient */
-datum JubatusClient::make_datum(int access_month, int cart, int buy) {
-	datum d;
-	d.num_values.push_back(make_pair("access_month", access_month));
-	d.num_values.push_back(make_pair("cart", cart));
-	d.num_values.push_back(make_pair("buy", buy));
-	return d;
-}
-
-/* initiation of jubaclassifier */
-void JubatusClient::Proc(){
-	//定期的にuserテーブルにuser情報を問い合わせ、jubatusに分類して、スコアを基にuser_shop_actionsのユーザタイプを更新する。
-	counter++;
-	if(jubacounter>=2){
-		RED cout<<"Uba::jubatus_test() start()!"<<endl;	RESET
-		jubacounter=0;
-		try{
-			connection *conn = pgsql->GetConn();
-			work T(*conn);
-			result *result_list;
-			result_list = new result( T.exec("select src_ip,access_day,access_month,cart,buy from user_shop_actions where access_day>=10") );
-
-			vector<datum> test_data;
-			for( result::const_iterator c = result_list->begin(); c != result_list->end(); c++ ){
-				test_data.push_back( make_datum( c[0].as(int()), c[1].as(int()), c[2].as(int()) ) );
-			}
-			T.commit();
-			test_data.push_back(make_datum(200,2,0));
-			test_data.push_back(make_datum(30,15,10));
-
-			vector<vector<estimate_result> > results = jubatus_classifier->classify("test", test_data);
-			for (size_t i = 0; i < results.size(); ++i) {
-				for (size_t j = 0; j < results[i].size(); ++j) {
-					const estimate_result& r = results[i][j];
-					std::cout << r.label << " " << r.score << std::endl;
-				}
-				std::cout << std::endl;
-			}
-			// 結果をもとにデータベースを更新する。
-		}catch(const exception &e){
-			cerr << e.what() << endl;
-		}catch(...){
-			cerr << "routerman >> unhandled error!! :)" << endl;
-		}
-		//VyattaProc();
-		RED cout<<"Uba::jubatus_test() end" <<endl; RESET
-	}
-//user_shop_actionsテーブルに問い合わせ、全てのGoodユーザのソースIPに対して静的ルーティングをする。
-}
-
-JubatusClient::JubatusClient(){
-	jubatus_classifier = new jubatus::classifier::client::classifier("localhost",9199,1.0);
-	RED cout<<"JubatusClient::JubatusClient() start!"<<endl;	RESET
-	try{
-		connection *conn = pgsql->GetConn();
-		work T(*conn);
-		result *result_list;
-		result_list = new result( T.exec("select class,access_month,cart,buy from user_shop_actions where train_flag=1") );
-		T.commit();
-		vector<pair<string, datum> > train_data;
-		for( result::const_iterator c = result_list->begin(); c != result_list->end(); c++ ){
-			train_data.push_back( make_pair( c[0].as(string()), make_datum( c[1].as(int()), c[2].as(int()), c[3].as(int()) ) ) );
-		}
-		train_data.push_back(make_pair("Good",make_datum(50,10,5)));
-		train_data.push_back(make_pair("Bad", make_datum(80,4,0)));
-		train_data.push_back(make_pair("Good",make_datum(50,10,10)));
-		train_data.push_back(make_pair("New", make_datum(20,2,0)));
-		jubatus_classifier->train("test",train_data);
-	}catch(const exception &e){
-		cerr << e.what() << endl;
-	}catch(...){
-		cerr << "routerman >> unhandled error!! :)" << endl;
-	}
-	RED cout<<"JubatusClient::JubatusClient() start!"<<endl;	RESET
 }
 

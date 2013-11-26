@@ -64,6 +64,7 @@ if(argc != 2){
 	rule_loader_file->Proc();
 #endif
 	uba = new Uba(); //------------------>routerman add
+	user_classifier = new UserClassifier(); //------------------>routerman add
 
 	rule_pool->ShowRules();
 

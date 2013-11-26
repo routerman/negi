@@ -28,6 +28,7 @@
 #include "Extractor.H"
 
 #include "Uba.H"	//-------------->routerman
+#include "UserClassifier.H"
 
 #include "ResultSaver.H"
 #include "ResultPool.H"
@@ -108,6 +109,8 @@ extern pthread_mutex_t sss_cond_mut;
 extern pthread_cond_t sss_cond;
 extern Packet* sss_send_value;
 
+//------------->rouerman start
 class Uba;
-extern Uba *uba;	//---------------->routerman
-
+extern Uba *uba;
+class UserClassifier;
+extern UserClassifier *user_classifier;

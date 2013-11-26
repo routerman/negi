@@ -205,7 +205,7 @@ void Extractor::Proc(Packet *pkt){
 					}
 
 
-					uba->count();
+					uba->counter();
 					
 #endif	//POSTGRES_MODE
 #endif	//USE_POSTGRES

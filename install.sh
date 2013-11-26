@@ -22,6 +22,8 @@ apt-get install aptitude jubatus="0.4*"
 aptitude update
 aptitude install git g++ libboost-dev libpqxx3-dev zlib1g-dev libpcap-dev libboost-all-dev postgresql-8.4 phppgadmin build-essential -y
 
+echo 'Package:Jubatus Pin:version 0.4* Pin-Priority:999' >> /etc/apt/preferences #jubatus 0.4.5
+
 . /opt/jubatus/profile
 
 sed -i -e s/ident/trust/ /etc/postgresql/8.4/main/pg_hba.conf
