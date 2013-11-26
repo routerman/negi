@@ -412,7 +412,7 @@ COPY rule (id, owner, expire_date, src_ip, src_netmask, src_port, dst_ip, dst_ne
 -- Data for Name: dns; Type: TABLE DATA; Schema: public; 
 --
 
-COPY  dns (id, dst_ip, host) FROM stdin;
+COPY dns (id, dst_ip, host) FROM stdin;
 1	54.240.248.0	www.amazon.co.jp
 2	202.72.50.10	www.rakuten.co.jp
 3	202.32.114.47	www.nitori-net.jp
@@ -427,23 +427,23 @@ COPY  dns (id, dst_ip, host) FROM stdin;
 --
 
 COPY url_action (id, host, method, url, referer, action, data) FROM stdin;
-1	www.nitori-net.jp	POST	/shop/cart/cart.aspx			\N	cart \N
-2	www.amazon.jp		GET	/gp/product/handle-buy-box	\N	cart \N
+1	www.nitori-net.jp	POST	/shop/cart/cart.aspx	\N	cart	\N
+2	www.amazon.jp	GET	/gp/product/handle-buy-box	\N	cart	\N
 \.
 --
 -- Data for Name: rule; Type: TABLE DATA; Schema: public; 
 --
 
 COPY user_shop_actions ( id, src_ip, host, access_day, access_time_day, access_month, access_time_month, cart, buy, class, train_flag) FROM stdin;
-1 \N \N  50 \N 100 \N 50 10 Good 1
-2 \N \N  60 \N 100 \N 50  5 Good 1
-3 \N \N 100 \N 300 \N 50  3 Good 1
-4 \N \N  80 \N   3 \N  3  0  Bad 1
-5 \N \N 120 \N   5 \N  6  0  Bad 1
-6 \N \N 100 \N   0 \N  0  0  Bad 1
-7 \N \N 	30 \N   0 \N  0  0  New 1
-8 \N \N  30 \N   0 \N  0  0  New 1
-9 \N \N  30 \N   0 \N  0  0  New 1
+1	\N	\N	50	\N	90	\N	50	10	Good	1
+2	\N	\N	60	\N	90	\N	50	5	Good	1
+3	\N	\N	90	\N	90	\N	50	3	Good	1
+4	\N	\N	80	\N	3	\N	3	0	Bad	1
+5	\N	\N	90	\N	5	\N	6	0	Bad	1
+6	\N	\N	90	\N	0	\N	0	0	Bad	1
+7	\N	\N	30	\N	0	\N	0	0	New	1
+8	\N	\N	10	\N	0	\N	0	0	New	1
+9	\N	\N	20	\N	0	\N	0	0	New	1
 \.
 
 
