@@ -64,6 +64,7 @@ void UserClassifier::Proc(){
 				std::cout << std::endl;
 			}
 			// 結果をもとにデータベースを更新する。
+			//T.exec( "update user_shop_actions set class='Good' where src_ip='" + it[0].as( string() ) + "'");
 		}catch(const exception &e){
 			cerr << e.what() << endl;
 		}catch(...){
