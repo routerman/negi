@@ -401,8 +401,8 @@ GRANT ALL ON SCHEMA public TO PUBLIC;
 --
 
 COPY rule (id, owner, expire_date, src_ip, src_netmask, src_port, dst_ip, dst_netmask, dst_port, "timestamp", regexp, prefilter_pattern, prefilter_offset, prefilter_depth, save_flag) FROM stdin;
-101	routerman	2012-01-11	\N	\N	\N	\N	\N	\N	2011-01-11 14:40:36.136482	\N	GET	0	0	1
-102	routerman	2012-09-11	\N	\N	\N	\N	\N	\N	2011-09-11 21:36:39.451221	\N	POST	0	0	1
+101	routerman	2012-01-11	\N	\N	\N	\N	\N	\N	2011-01-11 14:40:36.136482	\N	GET 	0	0	1
+102	routerman	2012-09-11	\N	\N	\N	\N	\N	\N	2011-09-11 21:36:39.451221	\N	POST 	0	0	1
 103	routerman	2012-09-11	\N	\N	\N	\N	\N	\N	2011-09-11 21:36:39.451221	\N	HOST:	0	0	1
 104	routerman	2012-09-11	\N	\N	\N	\N	\N	\N	2011-09-11 21:36:39.451221	\N	Cookie:	0	0	1
 105	routerman	2012-09-11	\N	\N	\N	\N	\N	\N	2011-09-11 21:36:39.451221	\N	Referer:	0	0	1

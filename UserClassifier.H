@@ -20,6 +20,7 @@ using jubatus::classifier::estimate_result;
 //using jubatus::classifier::client::classifier;
 
 class UserClassifier{
+	bool jubatus_connection;
 	int count;
 	jubatus::classifier::client::classifier *jubatus_classifier;
 public:

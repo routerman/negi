@@ -174,7 +174,7 @@ void Extractor::Proc(Packet *pkt){
 					string query = oss.str();
 
 #ifdef USE_POSTGRES
-					query += "','"+escape_binary((*it)->GetResultString(), (*it)->GetResultSize())+"');";
+					query += "',E'"+escape_binary((*it)->GetResultString(), (*it)->GetResultSize())+"');";
 //					cout << query << endl;
 
 #else
@@ -208,9 +208,6 @@ void Extractor::Proc(Packet *pkt){
 					catch(...){
 						cerr << "unhandled exception" << endl;
 					}
-
-
-					uba->counter();
 					
 #endif	//POSTGRES_MODE
 #endif	//USE_POSTGRES

@@ -2,27 +2,35 @@
 
 /* initiation of jubaclassifier */
 UserClassifier::UserClassifier(){
+	this->jubatus_connection = false;
 	RED cout<<"UserClassifier::UserClassifier() start!"<<endl;	RESET
-	jubatus_classifier = new jubatus::classifier::client::classifier("localhost",9199,1.0);
-	try{
-		connection *conn = pgsql->GetConn();
-		work T(*conn);
-		result *result_list;
-		result_list = new result( T.exec("select class,access_month,cart,buy from user_shop_actions where train_flag=1") );
-		T.commit();
-		vector<pair<string, datum> > train_data;
-		for( result::const_iterator c = result_list->begin(); c != result_list->end(); c++ ){
-			train_data.push_back( make_pair( c[0].as(string()), make_datum( c[1].as(int()), c[2].as(int()), c[3].as(int()) ) ) );
+/*
+	char *args[] = {"jubaclassifier","-f","/opt/jubatus/share/jubatus/example/config/classifier/pa.json","&"};
+	if( execvp(args[0],args) == -1 ){
+		jubatus_connection = false;
+		cerr <<"can't execute juaclassifier!!"<<endl;
+		return;
+	}
+*/
+
+	if(this->jubatus_connection){
+		jubatus_classifier = new jubatus::classifier::client::classifier("localhost",9199,1.0);
+		try{
+			connection *conn = pgsql->GetConn();
+			work T(*conn);
+			result *result_list;
+			result_list = new result( T.exec("select class,access_month,cart,buy from user_shop_actions where train_flag=1") );
+			T.commit();
+			vector<pair<string, datum> > train_data;
+			for( result::const_iterator c = result_list->begin(); c != result_list->end(); c++ ){
+				train_data.push_back( make_pair( c[0].as(string()), make_datum( c[1].as(int()), c[2].as(int()), c[3].as(int()) ) ) );
+			}
+			jubatus_classifier->train("test",train_data);
+		}catch(const exception &e){
+			cerr << e.what() << endl;
+		}catch(...){
+			cerr << "routerman >> unhandled error!! :)" << endl;
 		}
-		//train_data.push_back(make_pair("Good",make_datum(50,10,5)));
-		//train_data.push_back(make_pair("Bad", make_datum(80,4,0)));
-		//train_data.push_back(make_pair("Good",make_datum(50,10,10)));
-		//train_data.push_back(make_pair("New", make_datum(20,2,0)));
-		jubatus_classifier->train("test",train_data);
-	}catch(const exception &e){
-		cerr << e.what() << endl;
-	}catch(...){
-		cerr << "routerman >> unhandled error!! :)" << endl;
 	}
 	RED cout<<"UserClassifier::UserClassifier() start!"<<endl;	RESET
 }
@@ -35,18 +43,17 @@ datum UserClassifier::make_datum(int access_month, int cart, int buy) {
 	return d;
 }
 
+
 void UserClassifier::Proc(){
 	//定期的にuserテーブルにuser情報を問い合わせ、jubatusに分類して、スコアを基にuser_shop_actionsのユーザタイプを更新する。
-	count++;
-	if(count>=2){
-		RED cout<<"UserClassifier::Proc() staaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaart!"<<endl;	RESET
-		count=0;
-		try{
-			connection *conn = pgsql->GetConn();
-			work T(*conn);
-			result *result_list;
+	RED cout<<"UserClassifier::Proc() start!"<<endl;	RESET
+	try{
+		connection *conn = pgsql->GetConn();
+		work T(*conn);
+		result *result_list;
+		if( this->jubatus_connection ){
+			//Mode:Jubatus 
 			result_list = new result( T.exec("select src_ip,access_day,access_month,cart,buy from user_shop_actions where access_day>=10 and train_flag=0") );
-
 			vector<datum> test_data;
 			for( result::const_iterator c = result_list->begin(); c != result_list->end(); c++ ){
 				test_data.push_back( make_datum( c[0].as(int()), c[1].as(int()), c[2].as(int()) ) );
@@ -63,13 +70,25 @@ void UserClassifier::Proc(){
 				}
 				std::cout << std::endl;
 			}
-			// 結果をもとにデータベースを更新する。
-			//T.exec( "update user_shop_actions set class='Good' where src_ip='" + it[0].as( string() ) + "'");
-		}catch(const exception &e){
-			cerr << e.what() << endl;
-		}catch(...){
-			cerr << "routerman >> unhandled error!! :)" << endl;
+		}else{
+			//Mode:original scoring
+			result_list = new result( T.exec("select src_ip,access_day,access_month,cart,buy from user_shop_actions where access_day>=10 and train_flag=0") );
+			vector<double> score_list;
+			double score;
+			for( result::const_iterator c = result_list->begin(); c != result_list->end(); c++ ){
+				score =  c[0].as(int()) + c[1].as(int()) + c[2].as(int());
+				score_list.push_back(score);
+			}
 		}
-		RED cout<<"UserClassifier::Proc() end!" <<endl; RESET
+		// 結果をもとにデータベースを更新する。
+		//T.exec( "update user_shop_actions set class='Good' where src_ip='" + it[0].as( string() ) + "'");
+	}catch(const exception &e){
+		cerr << e.what() << endl;
+	}catch(...){
+		cerr << "routerman >> unhandled error!! :)" << endl;
 	}
+	RED cout<<"UserClassifier::Proc() end!" <<endl; RESET
 }
+
+
+

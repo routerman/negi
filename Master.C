@@ -45,9 +45,6 @@ void Master::Proc(Packet *pkt){
 
 	MASTER_DEBUG(MSG("extract"));
 		extractor->Proc(pkt);
-		
-	MASTER_DEBUG(MSG("extract"));
-		uba->Proc();
 	}
 
 	OBSERVER_DEBUG(observer->ShowMem(pkt->GetTimestamp());); 
@@ -63,6 +60,13 @@ void Master::Proc(Packet *pkt){
 	//		MSG("Packet Count: " << all_packet_counter);
 			observer_packet_counter = 0;
 			prev_time = now_time;
+				
+			MASTER_DEBUG(MSG("uba"));
+			uba->Proc();
+			MASTER_DEBUG(MSG("user_classifier"));
+			user_classifier->Proc();
+			MASTER_DEBUG(MSG("uba->VyattaProc()"));
+			uba->VyattaProc();	
 		}
 	}else{
 		observer_packet_counter++;
