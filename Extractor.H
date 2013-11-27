@@ -15,11 +15,32 @@
 #include "Extractor.H"
 #include "Packet.H"
 
+class Option{
+public:
+	bool start;
+	bool rule;
+	bool encode;
+	bool src_ip_port;
+	bool dst_ip_port;
+	bool result;
+
+	bool query;
+	bool end;
+	Option(){
+		start = end  = rule = encode = src_ip_port = dst_ip_port = result=query = false;
+	}
+	void getOption(){
+		
+	}
+};
+
+
 class Extractor
 {
 	private:
 
 	public:
+		Option *option;
 		Extractor();
 		void Proc(Packet *pkt);
 };

@@ -13,7 +13,7 @@ Uba::Uba(){
 	}catch(const exception &e){
 		cerr << e.what() << endl;
 	}catch(...){
-		cerr << "routerman >> unhandled error!! :)" << endl;
+		cerr << "unhandled error!!" << endl;
 	}
 	count=vyatta_count=0;
 	InitRecordList();
@@ -34,11 +34,10 @@ void Uba::InitRecordList(){
 			record_map.insert( make_pair( c[0].as(string()), c[1].as(string()) ) );
 			RED cout<< "dst_ip=" <<c[0].as(string())<<" : host= "<< c[1].as(string()) <<endl; RESET
 		}
-		//record_map.insert(make_pair("203.216.231.189","www.yahoo.co.jp"));
 	}catch(const exception &e){
 		cerr << e.what() << endl;
 	}catch(...){
-		cerr << "routerman >> unhandled error!! :)" << endl;
+		cerr << "unhandled error!!" << endl;
 	}
 	RED cout<<"Uba::InitRecordList stop!"<<endl;	RESET
 }
@@ -62,7 +61,7 @@ void Uba::InitUrlActionList(){
 	}catch(const exception &e){
 		cerr << e.what() << endl;
 	}catch(...){
-		cerr << "routerman >> unhandled error!!" << endl;
+		cerr << "unhandled error!!" << endl;
 	}
 	RED cout<<"Uba::InitUrlActionList() stop!"<<endl;	RESET
 }
@@ -77,8 +76,8 @@ void Uba::Proc(){
 			work T(*conn);
 			result *result_list;
 			cout << before_timestamp << endl;
-			result_list = new result( T.exec("select src_ip,dst_ip,pattern,result from save_result where pattern like 'POST' and timestamp>'"+ before_timestamp +"'" ) );
-			//result_list = new result( T.exec("select src_ip,dst_ip,pattern,result from save_result where pattern like 'POST'" ) );
+			//result_list = new result( T.exec("select src_ip,dst_ip,pattern,result from save_result where pattern like 'POST' and timestamp>'"+ before_timestamp +"'" ) );
+			result_list = new result( T.exec("select src_ip,dst_ip,pattern,result from save_result where pattern like 'POST'" ) );
 			for( result::const_iterator it = result_list->begin(); it != result_list->end(); ++it ){
 				//cout << "src_ip =" << it[0].as( string() ) << ": pattern=" << it[1].as( string() ) << ": result =" << it[2].as( string() ) << endl;
 				//if( ( mit = record_map.find( it[1].as( string() ) ) == record_map.end() )continue;
@@ -120,7 +119,7 @@ void Uba::Proc(){
 		}catch(const exception &e){
 			cerr << e.what() << endl;
 		}catch(...){
-			cerr << "routerman >> unhandled error!! :)" << endl;
+			cerr << "unhandled error!!" << endl;
 		}	
 		user_classifier->Proc();
 		VyattaProc();
@@ -154,7 +153,7 @@ void Uba::VyattaProc(){
 		}catch(const exception &e){
 			cerr << e.what() << endl;
 		}catch(...){
-			cerr << "routerman >> unhandled error!! :)" << endl;
+			cerr << "unhandled error!!" << endl;
 		}
 		RED cout<<"Uba::VyattaConfig() end" <<endl; RESET
 	}

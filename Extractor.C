@@ -16,6 +16,7 @@
 #include "Extractor.H"
 
 Extractor::Extractor(){
+	option = new Option();
 	return;
 }
 
@@ -116,12 +117,12 @@ void Extractor::Proc(Packet *pkt){
 				if((*it)->GetFinished()){
 					//Lets save it to PGSQL
 ///*
-				cout << "this is result!!--------------------" << endl;
+				if( option->start )cout << "this is result!!--------------------" << endl;
 //				pkt->Show();
 			//	cout << "TimeStamp: "; observer.ShowMem(pkt->GetTimestamp()) ;
 			//	cout << "Stream p: "<< pkt->GetStream() << endl;
 			//	cout << "Rule id: "<< (*it)->GetRuleId() << endl;
-				cout << "Rule : "<< (*it)->GetPRule()->GetPreFilterPattern() << endl;
+				if( option->rule )cout << "Rule : "<< (*it)->GetPRule()->GetPreFilterPattern() << endl;
 			//	cout << "Pattern Length: "<< (*it)->GetPatLen() << endl;
 			//	cout << "Stream Size: " << pkt->GetStream()->GetRetrievedContentSize() << endl;
 			//	cout << "Packet Size: " << pkt->GetL7ContentSize() << endl;
@@ -131,30 +132,34 @@ void Extractor::Proc(Packet *pkt){
 			//	cout << "ResultEnd: " << result_end_num << endl;
 			//	cout << "Flag: " << (*it)->GetFinished() << endl;
 				if(pkt->GetStream()->GetHttpCompress()==2){
-				BLUE	cout << "HTTP Encode: " << "GZIP--------------" << endl;RESET
+					if( option->encode ){
+						BLUE	cout << "HTTP Encode: " << "GZIP--------------" << endl;RESET
+					}
 //					cout << pkt->GetL7Content() << endl;
 //				BLUE	cout << "-------------------------------" << endl;RESET
 				}else{
-					cout << "HTTP Encode: " << "None" << endl;
+					if( option->encode )cout << "HTTP Encode: " << "None" << endl;
 				}
 
 
-				cout << "Source IP,port:      " << inet_ntoa(pkt->GetSrcIP()) << ","<< pkt->GetSrcPort()<< endl;
-				cout << "Destination IP,port: " << inet_ntoa(pkt->GetDstIP()) << "," <<pkt->GetDstPort()<< endl;
-				cout << "ResultString: ";
-				RED cout <<(*it)->GetPRule()->GetPreFilterPattern();
+				if( option->src_ip_port )cout << "Source IP,port:      " << inet_ntoa(pkt->GetSrcIP()) << ","<< pkt->GetSrcPort()<< endl;
+				if( option->dst_ip_port )cout << "Destination IP,port: " << inet_ntoa(pkt->GetDstIP()) << "," <<pkt->GetDstPort()<< endl;
+				if( option->result ){
+					cout << "ResultString: ";
+					RED cout <<(*it)->GetPRule()->GetPreFilterPattern();
 #ifdef USE_POSTGRES
-				YELLOW cout << escape_binary((*it)->GetResultString(), (*it)->GetResultSize()) << endl; RESET
+					YELLOW cout << escape_binary((*it)->GetResultString(), (*it)->GetResultSize()) << endl; RESET
 #else
-				YELLOW cout << (*it)->GetResultString()  << endl; RESET
+					YELLOW cout << (*it)->GetResultString()  << endl; RESET
 #endif
-				cout << (*it)->GetResultString() << endl;
+					cout << (*it)->GetResultString() << endl;
+				}
 				if(!strcmp((*it)->GetPRule()->GetPreFilterPattern().c_str(),"VIRUS")){
 					URED cout << "VIRUS DETECTED!! Shut out :"<< inet_ntoa(pkt->GetSrcIP()) << endl; RESET
 					RED; system("./nii-filter -A 11.11.11.1 -I xe-0/0/0");RESET
 				}
 
-				cout << "------------------------------------" << endl;
+				if( option->end )cout << "------------------------------------" << endl;
 //*/
 
 					ostringstream oss;
@@ -181,7 +186,7 @@ void Extractor::Proc(Packet *pkt){
 					query += "');";
 					free(temp);
 #endif
-					cout << query << endl;
+					if( option->query )cout << query << endl;
 
 #ifdef FILEWRITE_MODE
 						file_writer->Write(query);
