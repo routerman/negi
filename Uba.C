@@ -39,39 +39,63 @@ Uba::Uba(){
 		//tmp = new UrlAction("/shop/cart/cart.aspx","www.nitori-net.jp","cart");
 		url_action_list.push_back(*tmp);
 	}
+
+	except_extension.push_back(".jpg");
+	except_extension.push_back(".png");
+	except_extension.push_back(".gif");
+	except_extension.push_back(".css");
+	except_extension.push_back(".js");
+	//for( vector<string>::iterator it = except_extension.begin(); it!=except_extension; it++ ){}
 }
 
 void Uba::Proc(){
+	bool flag;
 	RED cout<<"Uba::Proc() start"<<endl; RESET
 	cout  << before_timestamp << endl;
-	result *result_list = getResult("select src_ip,dst_ip,pattern,result from save_result where pattern='POST ' and timestamp>'"+ before_timestamp +"'");
+	//result *result_list = getResult("select src_ip,dst_ip,pattern,result from save_result where pattern='POST ' and timestamp>'"+ before_timestamp +"'");
+	//result *result_list = getResult("select src_ip,dst_ip,pattern,result from save_result where pattern='GET ' and timestamp>'"+ before_timestamp +"'");
 	//result *result_list = getResult("select src_ip,dst_ip,pattern,result from save_result where timestamp>='"+ before_timestamp +"' and ( pattern='GET ' or pattern='POST ' )");
-	//result *result_list = getResult("select src_ip,dst_ip,pattern,result from save_result where timestamp>='"+ before_timestamp +"' and pattern='POST '");
+	result *result_list = getResult("select src_ip,dst_ip,pattern,result from save_result where timestamp>='"+ before_timestamp +"' and pattern='POST '");
 	for( result::const_iterator it = result_list->begin(); it != result_list->end(); ++it ){
+		//ホストフィルタ。dst_ipが登録されていない場合はcontinue;
 		//if( ( mit = record_map.find( it[1].as( string() ) ) == record_map.end() )continue;
 		mit = record_map.find( it[1].as( string() ) );
-		if( mit == record_map.end() )continue;	//HOSTが登録されてなければ無視
+		if( mit == record_map.end() )continue;	
 		string host = (*mit).second;
-		cout <<"src_ip="<< it[0].as(string())<<":host="<< host <<":result="<< it[2].as(string()) <<":"<<it[3].as(string()) << endl;
+
+		cout <<"src_ip="<< it[0].as(string())<<":host="<< host <<":result="<< it[2].as(string()) <<":"<<it[3].as(string())<<"---->";
+		//拡張子フィルタ。resultに"css","gif"などページファイルが含まれる場合はcontinue;
+		//for( vector<string>::iterator jt = except_extension.begin(); jt!=except_extension; jt++ ){
+		flag=false;
+		for( unsigned int jt=0; jt<except_extension.size(); jt++){
+			if( it[3].as( string() ).find( except_extension[jt],0 ) != string::npos ){
+				cout<<"exception!"<< except_extension[jt] << endl;
+				flag=true;
+				break;
+			}
+		}
+		if(flag)continue;
+
+		//アクセスカウント
+		//if( getResult( "update user_shop_actions set access_day=access_day+1 where src_ip='"+it[0].as( string() )+"' and host='"+host+"'") ){
+		//	getResult("insert into user_shop_actions(src_ip,host,access_day,access_month,cart,buy) values('"+it[0].as(string())+"','"+host+"',0,0,0,0)" );
+		//}
+
+		//アクセスカウント
+		result *res = getResult("select src_ip from user_shop_actions where src_ip='"+it[0].as(string())+"' and host='"+host+"'");
+		if(res->size()==0){
+			RED cout << "INSERT!!" + it[0].as(string()) << " in host="<< host <<endl; RESET
+			getResult("insert into user_shop_actions(src_ip,host,access_day,access_month,cart,buy) values('"+it[0].as(string())+"','"+host+"',0,0,0,0)" );
+		}
+		RED cout << "ACCESS!!" + it[0].as(string())<<" in host=" << host <<endl; RESET
+		getResult("update user_shop_actions set access_day=access_day+1 where src_ip='"+it[0].as(string())+"' and host='"+host+"'");
+
+		//該当するホストとアクションを探し、インクリメントする
 		for( vector<UrlAction>::iterator jt = url_action_list.begin(); jt != url_action_list.end(); jt++){
-			if( jt->host==host ){
-				//ACCESS COUNT
-				if( it[3].as( string() ).find( jt->url,0 ) != string::npos ){
-					RED
-					//src_ipのカラムのactionをインクリメント。
-					//if( T.exec( "update user_shop_actions set " + jt->action + "_count=" + jt->action + "_count +1 where src_ip='"+it[0].as( string() ) + "'") ){
-					//	T.exec( "insert into user_shop_actions(src_ip,access_count,cart_count,buy_count) value('src_ip',0,0,0)" );
-					//}
-					result *res = getResult("select src_ip from user_shop_actions where src_ip like '"+ it[0].as( string() ) +"' and host= '"+ host +"'");
-					if(res->size()==0){
-						cout << "INSERT!!" + it[0].as( string() ) << " in host="<< host <<endl;
-						getResult("insert into user_shop_actions(src_ip,host,access_day,access_month,cart,buy) values('"+ it[0].as( string() ) +"','"+ host +"',0,0,0,0)" );
-					}
-					cout << "UPDATE!!" + it[0].as( string() )<<" in host=" << host <<endl;
-					getResult("update user_shop_actions set " + jt->action + "=" + jt->action + "+1 where src_ip='"+it[0].as( string() ) + "' and host='"+ host +"'");
-					RESET
-					break;
-				}
+			if( jt->host==host && it[3].as( string() ).find( jt->url,0 ) != string::npos ){
+				RED cout << "UPDATE!!" + it[0].as(string()) +" in host="+host <<endl; RESET
+				getResult("update user_shop_actions set " + jt->action + "=" + jt->action + "+1 where src_ip='"+it[0].as( string() ) + "' and host='"+ host +"'");
+				break;
 			}
 		}
 	}
@@ -91,11 +115,9 @@ void Uba::VyattaProc(){
 	for( result::const_iterator it = result_list->begin(); it != result_list->end(); ++it ){
 		//ここでvyattaAPIをたたき、各GoodユーザのソースIPの次ホップを高品質サーバ行きに
 		//cli_config_api("set protocols static route "+ it[0].as( string() )  +" next-hop 0.0.0.0");
+		//char *args[] = {"/bin/echo","abc",NULL};
+		//execvp(args[0],args);
 	}
-	RED
-	//char *args[] = {"/bin/echo","abc",NULL};
-	//execvp(args[0],args);
-	RESET
 	RED cout<<"Uba::VyattaConfig() end" <<endl; RESET
 }
 

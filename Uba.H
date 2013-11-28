@@ -28,6 +28,7 @@ public:
 class Uba{
 public:
 	string before_timestamp;
+	vector<string> except_extension;
 	vector<UrlAction> url_action_list;
 	map<string,string> record_map;
    map<string,string>::iterator mit;
