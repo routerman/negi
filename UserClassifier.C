@@ -4,8 +4,9 @@
 UserClassifier::UserClassifier(){
 	this->jubatus_connection = false;
 	RED cout<<"UserClassifier::UserClassifier() start!"<<endl;	RESET
+
 /*
-	char *args[] = {"jubaclassifier","-f","/opt/jubatus/share/jubatus/example/config/classifier/pa.json","&"};
+	char *args[] = {"jubaclassifier","-f","/opt/jubatus/share/jubatus/example/config/classifier/pa.json","&",NULL};
 	if( execvp(args[0],args) == -1 ){
 		jubatus_connection = false;
 		cerr <<"can't execute juaclassifier!!"<<endl;
@@ -32,7 +33,7 @@ UserClassifier::UserClassifier(){
 			cerr << "routerman >> unhandled error!! :)" << endl;
 		}
 	}
-	RED cout<<"UserClassifier::UserClassifier() start!"<<endl;	RESET
+	RED cout<<"UserClassifier::UserClassifier() end"<<endl;	RESET
 }
 
 datum UserClassifier::make_datum(int access_month, int cart, int buy) {

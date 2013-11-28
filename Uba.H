@@ -7,6 +7,7 @@
 //#include "Result.H"
 
 using namespace std;
+//using namespace pqxx;
 
 class UrlAction{
 public:
@@ -26,18 +27,14 @@ public:
 //User Behavior Accumulation
 class Uba{
 public:
-	unsigned int count,vyatta_count;
 	string before_timestamp;
 	vector<UrlAction> url_action_list;
 	map<string,string> record_map;
    map<string,string>::iterator mit;
-	void counter(){count++;}
 	void Proc();
 	//vyatta
 	void VyattaProc();
-	//Initiation	
-	void InitRecordList();
-	void InitUrlActionList();
+	pqxx::result* getResult(string query);
 	Uba();
 };
 
