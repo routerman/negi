@@ -36,9 +36,14 @@ Uba::Uba(){
 	for( result::const_iterator c = result_list->begin(); c != result_list->end(); c++ ){
 		tmp = new UrlAction( c[0].as(string()), c[1].as(string()), c[2].as(string()) );
 		//cout<<"url="<< c[0].as(string())<<":host="<< c[1].as(string()) <<":action"<<  c[2].as(string()) << endl;
-		//tmp = new UrlAction("/shop/cart/cart.aspx","www.nitori-net.jp","cart");
 		url_action_list.push_back(*tmp);
 	}
+	tmp = new UrlAction("/gp/product/handle-buy-box/ref","www.amazon.co.jp","cart");
+	url_action_list.push_back(*tmp);
+	tmp = new UrlAction("/gp/huc/csrf-add.html/ref","www.amazon.co.jp","cart");
+	url_action_list.push_back(*tmp);
+	//tmp = new UrlAction("/gp/product/handle-buy-box/ref","www.amazon.co.jp","cart");
+	//url_action_list.push_back(*tmp);
 
 	except_extension.push_back(".jpg");
 	except_extension.push_back(".png");
@@ -54,18 +59,17 @@ void Uba::Proc(){
 	cout  << before_timestamp << endl;
 	//result *result_list = getResult("select src_ip,dst_ip,pattern,result from save_result where pattern='POST ' and timestamp>'"+ before_timestamp +"'");
 	//result *result_list = getResult("select src_ip,dst_ip,pattern,result from save_result where pattern='GET ' and timestamp>'"+ before_timestamp +"'");
-	//result *result_list = getResult("select src_ip,dst_ip,pattern,result from save_result where timestamp>='"+ before_timestamp +"' and ( pattern='GET ' or pattern='POST ' )");
-	result *result_list = getResult("select src_ip,dst_ip,pattern,result from save_result where timestamp>='"+ before_timestamp +"' and pattern='POST '");
+	result *result_list = getResult("select src_ip,dst_ip,pattern,result from save_result where timestamp>='"+ before_timestamp +"' and ( pattern='GET ' or pattern='POST ' )");
+	//result *result_list = getResult("select src_ip,dst_ip,pattern,result from save_result where timestamp>='"+ before_timestamp +"' and pattern='POST '");
 	for( result::const_iterator it = result_list->begin(); it != result_list->end(); ++it ){
 		//ホストフィルタ。dst_ipが登録されていない場合はcontinue;
-		//if( ( mit = record_map.find( it[1].as( string() ) ) == record_map.end() )continue;
+		//if( ( mit = record_map.find( it[1].as( string() ) ) == record_map.end() )continue;//ホントはこう書きたい
 		mit = record_map.find( it[1].as( string() ) );
 		if( mit == record_map.end() )continue;	
 		string host = (*mit).second;
 
 		cout <<"src_ip="<< it[0].as(string())<<":host="<< host <<":result="<< it[2].as(string()) <<":"<<it[3].as(string())<<"---->";
 		//拡張子フィルタ。resultに"css","gif"などページファイルが含まれる場合はcontinue;
-		//for( vector<string>::iterator jt = except_extension.begin(); jt!=except_extension; jt++ ){
 		flag=false;
 		for( unsigned int jt=0; jt<except_extension.size(); jt++){
 			if( it[3].as( string() ).find( except_extension[jt],0 ) != string::npos ){
@@ -76,7 +80,7 @@ void Uba::Proc(){
 		}
 		if(flag)continue;
 
-		//アクセスカウント
+		//アクセスカウント。ホントはこう書きたい。
 		//if( getResult( "update user_shop_actions set access_day=access_day+1 where src_ip='"+it[0].as( string() )+"' and host='"+host+"'") ){
 		//	getResult("insert into user_shop_actions(src_ip,host,access_day,access_month,cart,buy) values('"+it[0].as(string())+"','"+host+"',0,0,0,0)" );
 		//}
@@ -92,8 +96,8 @@ void Uba::Proc(){
 
 		//該当するホストとアクションを探し、インクリメントする
 		for( vector<UrlAction>::iterator jt = url_action_list.begin(); jt != url_action_list.end(); jt++){
-			if( jt->host==host && it[3].as( string() ).find( jt->url,0 ) != string::npos ){
-				RED cout << "UPDATE!!" + it[0].as(string()) +" in host="+host <<endl; RESET
+			if( jt->host==host && it[2].as(string())=="POST "  && it[3].as( string() ).find( jt->url,0 ) != string::npos ){
+				RED cout << jt->action << "!! src_ip=" + it[0].as(string()) +" in host="+host <<endl; RESET
 				getResult("update user_shop_actions set " + jt->action + "=" + jt->action + "+1 where src_ip='"+it[0].as( string() ) + "' and host='"+ host +"'");
 				break;
 			}
@@ -105,19 +109,20 @@ void Uba::Proc(){
 	before_timestamp = c[0].as( string() );
 	cout << before_timestamp << endl;
 	//conn->disconnect();
-	RED cout<<"Uba::Proc() end" <<endl; RESET
+	//RED cout<<"Uba::Proc() end" <<endl; RESET
 }
 
 //user_shop_actionsテーブルに問い合わせ、全てのGoodユーザのソースIPに対して静的ルーティングをする。
 void Uba::VyattaProc(){
 	RED cout<<"Uba::VyattaConfig() start!"<<endl;	RESET
-	result *result_list = getResult("select src_ip from user_shop_actions where class='Good'");
-	for( result::const_iterator it = result_list->begin(); it != result_list->end(); ++it ){
+	result *result_list = getResult("select src_ip,host from user_shop_actions where class='Good' and train_flag=0");
+	for( result::const_iterator c = result_list->begin(); c != result_list->end(); ++c ){
+		cout <<"src_ip:"<< c[0].as(string()) <<" is Good user for host:"<< c[1].as(string()) <<endl;
 		//ここでvyattaAPIをたたき、各GoodユーザのソースIPの次ホップを高品質サーバ行きに
 		//cli_config_api("set protocols static route "+ it[0].as( string() )  +" next-hop 0.0.0.0");
 		//char *args[] = {"/bin/echo","abc",NULL};
 		//execvp(args[0],args);
 	}
-	RED cout<<"Uba::VyattaConfig() end" <<endl; RESET
+	//RED cout<<"Uba::VyattaConfig() end" <<endl; RESET
 }
 

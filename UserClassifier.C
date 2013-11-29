@@ -15,6 +15,7 @@ UserClassifier::UserClassifier(){
 */
 
 	if(this->jubatus_connection){
+		cout<<"selected Jubatus Mode!"<<endl;
 		jubatus_classifier = new jubatus::classifier::client::classifier("localhost",9199,1.0);
 		try{
 			connection *conn = pgsql->GetConn();
@@ -32,8 +33,9 @@ UserClassifier::UserClassifier(){
 		}catch(...){
 			cerr << "routerman >> unhandled error!! :)" << endl;
 		}
+	}else{
+		cout<<"selected original evaluate function!"<<endl;
 	}
-	RED cout<<"UserClassifier::UserClassifier() end"<<endl;	RESET
 }
 
 datum UserClassifier::make_datum(int access_month, int cart, int buy) {
@@ -44,51 +46,45 @@ datum UserClassifier::make_datum(int access_month, int cart, int buy) {
 	return d;
 }
 
-
 void UserClassifier::Proc(){
-	//定期的にuserテーブルにuser情報を問い合わせ、jubatusに分類して、スコアを基にuser_shop_actionsのユーザタイプを更新する。
 	RED cout<<"UserClassifier::Proc() start!"<<endl;	RESET
+	result *result_list;
 	try{
 		connection *conn = pgsql->GetConn();
 		work T(*conn);
-		result *result_list;
-		if( this->jubatus_connection ){
-			//Mode:Jubatus 
-			result_list = new result( T.exec("select src_ip,access_day,access_month,cart,buy from user_shop_actions where access_day>=10 and train_flag=0") );
-			vector<datum> test_data;
-			for( result::const_iterator c = result_list->begin(); c != result_list->end(); c++ ){
-				test_data.push_back( make_datum( c[0].as(int()), c[1].as(int()), c[2].as(int()) ) );
-			}
-			T.commit();
-			test_data.push_back(make_datum(200,2,0));
-			test_data.push_back(make_datum(30,15,10));
-
-			vector<vector<estimate_result> > results = jubatus_classifier->classify("test", test_data);
-			for (size_t i = 0; i < results.size(); ++i) {
-				for (size_t j = 0; j < results[i].size(); ++j) {
-					const estimate_result& r = results[i][j];
-					std::cout << r.label << " " << r.score << std::endl;
-				}
-				std::cout << std::endl;
-			}
-		}else{
-			//Mode:original scoring
-			result_list = new result( T.exec("select src_ip,access_day,access_month,cart,buy from user_shop_actions where access_day>=10 and train_flag=0") );
-			vector<double> score_list;
-			double score;
-			for( result::const_iterator c = result_list->begin(); c != result_list->end(); c++ ){
-				score =  c[0].as(int()) + c[1].as(int()) + c[2].as(int());
-				score_list.push_back(score);
-			}
-		}
-		// 結果をもとにデータベースを更新する。
-		//T.exec( "update user_shop_actions set class='Good' where src_ip='" + it[0].as( string() ) + "'");
+		result_list = new result( T.exec("select src_ip,access_day,access_month,cart,buy from user_shop_actions where train_flag=0") );
+		T.commit();
 	}catch(const exception &e){
 		cerr << e.what() << endl;
 	}catch(...){
 		cerr << "routerman >> unhandled error!! :)" << endl;
 	}
-	RED cout<<"UserClassifier::Proc() end!" <<endl; RESET
+	//evaluation
+	vector<double> score_list;
+	if( this->jubatus_connection ){
+		//Mode:Jubatus 
+		vector<datum> test_data;
+		for( result::const_iterator c = result_list->begin(); c != result_list->end(); c++ ){
+			test_data.push_back( make_datum( c[0].as(int()), c[1].as(int()), c[2].as(int()) ) );
+		}
+		vector<vector<estimate_result> > results = jubatus_classifier->classify("test", test_data);
+		for (size_t i = 0; i < results.size(); ++i) {
+			for (size_t j = 0; j < results[i].size(); ++j) {
+				const estimate_result& r = results[i][j];
+				std::cout << r.label << " " << r.score << std::endl;
+			}
+			std::cout << std::endl;
+		}
+	}else{
+		//Mode:original scoring
+		double score;
+		for( result::const_iterator c = result_list->begin(); c != result_list->end(); c++ ){
+			score =  c[0].as(int()) + c[1].as(int()) + c[2].as(int());
+			score_list.push_back(score);
+			cout << score << endl;
+		}
+	}
+	//view
 }
 
 
