@@ -24,6 +24,7 @@ class UserClassifier{
 	int count;
 	jubatus::classifier::client::classifier *jubatus_classifier;
 public:
+	pqxx::result* getResult(string query);
 	datum make_datum(int access_month, int cart, int buy);
 	void Proc();
 	void counter(){count++;}

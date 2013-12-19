@@ -1,38 +1,38 @@
 #include"UserClassifier.H"
 
+
+pqxx::result* UserClassifier::getResult(string query){
+	result *result_list;
+	try{
+		connection *conn = pgsql->GetConn();
+		work T(*conn);
+		result_list = new result( T.exec(query) );
+		T.commit();
+	}catch(const exception &e){
+		cerr << e.what() << endl;
+	}catch(...){
+		cerr << "unhandled error!!" << endl;
+	}
+	return result_list;
+}
+
 /* initiation of jubaclassifier */
 UserClassifier::UserClassifier(){
-	this->jubatus_connection = false;
+	this->jubatus_connection = true;
 	RED cout<<"UserClassifier::UserClassifier() start!"<<endl;	RESET
-
-/*
-	char *args[] = {"jubaclassifier","-f","/opt/jubatus/share/jubatus/example/config/classifier/pa.json","&",NULL};
-	if( execvp(args[0],args) == -1 ){
-		jubatus_connection = false;
-		cerr <<"can't execute juaclassifier!!"<<endl;
-		return;
-	}
-*/
 
 	if(this->jubatus_connection){
 		cout<<"selected Jubatus Mode!"<<endl;
 		jubatus_classifier = new jubatus::classifier::client::classifier("localhost",9199,1.0);
-		try{
-			connection *conn = pgsql->GetConn();
-			work T(*conn);
-			result *result_list;
-			result_list = new result( T.exec("select class,access_month,cart,buy from actions_count where train_flag=1") );
-			T.commit();
-			vector<pair<string, datum> > train_data;
-			for( result::const_iterator c = result_list->begin(); c != result_list->end(); c++ ){
-				train_data.push_back( make_pair( c[0].as(string()), make_datum( c[1].as(int()), c[2].as(int()), c[3].as(int()) ) ) );
-			}
-			jubatus_classifier->train("test",train_data);
-		}catch(const exception &e){
-			cerr << e.what() << endl;
-		}catch(...){
-			cerr << "routerman >> unhandled error!! :)" << endl;
+
+		result *result_list;
+		result_list = getResult("select class,access_month,cart,buy from action_count where train_flag=1");
+		
+		vector<pair<string, datum> > train_data;
+		for( result::const_iterator c = result_list->begin(); c != result_list->end(); c++ ){
+			train_data.push_back( make_pair( c[0].as(string()), make_datum( c[1].as(int()), c[2].as(int()), c[3].as(int()) ) ) );
 		}
+		jubatus_classifier->train("test",train_data);
 	}else{
 		cout<<"selected original evaluate function!"<<endl;
 	}
@@ -49,16 +49,8 @@ datum UserClassifier::make_datum(int access_month, int cart, int buy) {
 void UserClassifier::Proc(){
 	RED cout<<"UserClassifier::Proc() start!"<<endl;	RESET
 	result *result_list;
-	try{
-		connection *conn = pgsql->GetConn();
-		work T(*conn);
-		result_list = new result( T.exec("select src_ip,access_day,access_month,cart,buy from action_count where train_flag=1") );
-		T.commit();
-	}catch(const exception &e){
-		cerr << e.what() << endl;
-	}catch(...){
-		cerr << "routerman >> unhandled error!! :)" << endl;
-	}
+	result_list = getResult("select src_ip,access_day,access_month,cart,buy from action_count where train_flag=1");
+	
 	//evaluation
 	vector<double> score_list;
 	if( this->jubatus_connection ){
@@ -67,6 +59,7 @@ void UserClassifier::Proc(){
 		for( result::const_iterator c = result_list->begin(); c != result_list->end(); c++ ){
 			test_data.push_back( make_datum( c[0].as(int()), c[1].as(int()), c[2].as(int()) ) );
 		}
+
 		vector<vector<estimate_result> > results = jubatus_classifier->classify("test", test_data);
 		for (size_t i = 0; i < results.size(); ++i) {
 			for (size_t j = 0; j < results[i].size(); ++j) {

@@ -3,7 +3,8 @@
 #include "UserClassifier.H"
 #include "Include.H"
 #include "Global.H"
-//#include "Packet.H"
+#include "Stream.H"
+#include "Packet.H"
 //#include "Result.H"
 
 using namespace std;
@@ -67,6 +68,7 @@ class Uba{
 public:
 	Uba();
 	void Proc();
+	void Proc( Packet *pkt);
 	//vyatta
 	pqxx::result* getResult(string query);
 	bool extension_filter( string result );

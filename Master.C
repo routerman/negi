@@ -43,8 +43,12 @@ void Master::Proc(Packet *pkt){
 	MASTER_DEBUG(MSG("match_pre"));
 		match_pre_filter->Proc(pkt);
 
+	//MASTER_DEBUG(MSG("uba"));
+	//	uba->Proc(pkt);
+
 	MASTER_DEBUG(MSG("extract"));
 		extractor->Proc(pkt);
+
 	}
 
 	OBSERVER_DEBUG(observer->ShowMem(pkt->GetTimestamp());); 
@@ -65,8 +69,8 @@ void Master::Proc(Packet *pkt){
 			uba->Proc();
 			MASTER_DEBUG(MSG("user_classifier"));
 			user_classifier->Proc();
-			MASTER_DEBUG(MSG("uba->VyattaProc()"));
-			uba->VyattaProc();	
+			//MASTER_DEBUG(MSG("uba->VyattaProc()"));
+			//uba->VyattaProc();	
 		}
 	}else{
 		observer_packet_counter++;

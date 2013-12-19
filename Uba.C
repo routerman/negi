@@ -97,6 +97,44 @@ void Uba::Proc(){
 	//RED cout<<"Uba::Proc() end" <<endl; RESET
 }
 
+void Uba::Proc( Packet *pkt ){
+	RED cout<<"Uba::Proc( PapaResult it) start"<<endl; RESET
+	Entry *entry;
+	cout  << before_timestamp << endl;
+	if(pkt->GetStream() != 0){
+		for(list<PapaResult*>::iterator it = pkt->GetStream()->GetPapaResultListFirstIt(); it != pkt->GetStream()->GetPapaResultListLastIt(); it++){
+			if((*it)->GetPRule()->GetSaveFlag()){
+				/*
+				//search host from record_map
+				mit = record_map.find( it );
+				if ( mit == record_map.end() ) continue;
+				string host = (*mit).second;
+				//extension_filter
+				if ( extension_filter( c[4].as(string()) ) == true ) continue;
+
+				//cout<<"timestamp="<< c[0].as(string())<<": src_ip="<< c[1].as(string()) <<": host="<< host<<endl;
+				//timestamp,src_ip,dst_ip
+				entry = new Entry( c[0].as(string()), c[1].as(string()), host);
+				//cout<<"timestamp="<< entry->timestamp <<": src_ip="<< entry->src_ip <<": host="<< entry->host<<endl;
+				//Analyze
+				AnalyzeAction(c, entry);
+				//write Log Table
+				LogTable(entry);
+				//write count table
+				CountTable(entry);
+				delete entry;
+				*/
+			}
+		}
+		//update timestamp
+		result *tmp = getResult("select CURRENT_TIMESTAMP(0) AT TIME ZONE 'JST'" );
+		result::const_iterator c = tmp->begin();
+		before_timestamp = c[0].as( string() );
+		cout << before_timestamp << endl;
+		//conn->disconnect();
+	}
+}
+
 void Uba::AnalyzeAction( pqxx::result::const_iterator c, Entry *entry){
 	//ここでデータベースに挿入できる形までentryを加工する
 	//type,actions,url,titile,object
@@ -104,12 +142,13 @@ void Uba::AnalyzeAction( pqxx::result::const_iterator c, Entry *entry){
 	//entry->type 	  = c[0].as( string() );	
 	//entry-> = c[0].as( string() );
 
+	entry->url = "http://" + entry->host + c[4].as(string());
+	
 	for( vector<UrlAction>::iterator it = url_action_list.begin(); it != url_action_list.end(); it++){
 		if( it->getHost()==entry->host && c[3].as(string())=="POST "  && c[4].as(string()).find( it->getUrl(),0 ) != string::npos ){
 			RED cout << it->getAction() << "!! src_ip=" + entry->src_ip +" in host="+ entry->host <<endl; RESET
 			entry->action = it->getAction();
 			entry->type = "EC";
-			entry->url = "http://" + entry->host + c[4].as(string());
 			//entry-> = it->getAction();
 			break;
 		}
@@ -120,15 +159,16 @@ void Uba::AnalyzeAction( pqxx::result::const_iterator c, Entry *entry){
 
 //Log to action_log table
 void Uba::LogTable(Entry *entry){
-	cout<<"Uba::LogTable() start!"<<endl;
+	RED cout<<"Uba::LogTable() start!"<<endl; RESET
 	//getResult("insert into action_log(timestamp,src_ip,host,service_type,action,url,title,object) values('"+ entry->timestamp +"','"+ entry->src_ip +"','"+ entry->host +"','"+ entry->type +"','"+ entry->action +"','"+ entry->url +"','"+ entry->title +"',"'+ entry->object +'")" );
-	getResult("insert into action_log(timestamp,src_ip,host,action,url) values('"+ entry->timestamp +"','"+ entry->src_ip +"','"+ entry->host +"','"+ entry->action +"',E'"+ entry->url +"')" );
+	//getResult("insert into action_log(timestamp,src_ip,host,action,url) values('"+ entry->timestamp +"','"+ entry->src_ip +"','"+ entry->host +"','"+ entry->action +"',E'"+ escape_binary( entry->url, 30 )+"')");
+	getResult("insert into action_log(timestamp,src_ip,host,action,url) values('"+ entry->timestamp +"','"+ entry->src_ip +"','"+ entry->host +"','"+ entry->action +"',E'"+ entry->url+"')");
 	cout<<"insert into action_log(timestamp,src_ip,host,action,url) values('"+ entry->timestamp +"','"+ entry->src_ip +"','"+ entry->host +"','"+ entry->action +"',E'"+ entry->url +"')" <<endl;
 }
 
 //void Uba::update_shoptable( pqxx::result::const_iterator c ,string host){
 void Uba::CountTable( Entry *entry ){
-	cout<<"Uba::CountTable() start!"<<endl;
+	RED cout<<"Uba::CountTable() start!"<<endl; RESET
 	//RED cout<<"Uba::update_shoptable() start"<<endl; RESET
 	//アクセスカウント。ホントはこう書きたい。
 	//if( getResult( "update user_shop_actions set access_day=access_day+1 where src_ip='"+it[0].as( string() )+"' and host='"+host+"'") ){
@@ -139,8 +179,9 @@ void Uba::CountTable( Entry *entry ){
 		RED cout << "INSERT!!" + entry->src_ip << " in host="<< entry->host <<endl; RESET
 		getResult("insert into action_count(src_ip,host,access_day,access_month,cart,buy) values('"+ entry->src_ip +"','"+ entry->host +"',0,0,0,0)" );
 	}
-	RED cout << "ACCESS!!" + entry->src_ip + " in host=" << entry->host <<endl; RESET
-	getResult("update action_count set access_day=access_day+1 where src_ip='"+ entry->src_ip +"' and host='"+ entry->host +"'");
+	//RED cout << "ACCESS!!" + entry->src_ip + " in host=" << entry->host <<endl; RESET
+	//getResult("update action_count set access_day=access_day+1 where src_ip='"+ entry->src_ip +"' and host='"+ entry->host +"'");
+	if( entry->action == "access" )entry->action += "_day";
 	if( entry->action.empty() == false ){
 		RED cout << entry->action << "!! src_ip=" + entry->src_ip +" in host="+ entry->host <<endl; RESET
 		getResult("update action_count set " + entry->action + "=" + entry->action + "+1 where src_ip='"+ entry->src_ip + "' and host='"+ entry->host +"'");
