@@ -21,7 +21,7 @@ UserClassifier::UserClassifier(){
 			connection *conn = pgsql->GetConn();
 			work T(*conn);
 			result *result_list;
-			result_list = new result( T.exec("select class,access_month,cart,buy from user_actions_shop where train_flag=1") );
+			result_list = new result( T.exec("select class,access_month,cart,buy from actions_count where train_flag=1") );
 			T.commit();
 			vector<pair<string, datum> > train_data;
 			for( result::const_iterator c = result_list->begin(); c != result_list->end(); c++ ){
@@ -52,7 +52,7 @@ void UserClassifier::Proc(){
 	try{
 		connection *conn = pgsql->GetConn();
 		work T(*conn);
-		result_list = new result( T.exec("select src_ip,access_day,access_month,cart,buy from user_actions_shop where train_flag=0") );
+		result_list = new result( T.exec("select src_ip,access_day,access_month,cart,buy from action_count where train_flag=1") );
 		T.commit();
 	}catch(const exception &e){
 		cerr << e.what() << endl;
@@ -81,7 +81,7 @@ void UserClassifier::Proc(){
 		for( result::const_iterator c = result_list->begin(); c != result_list->end(); c++ ){
 			score =  c[0].as(int()) + c[1].as(int()) + c[2].as(int());
 			score_list.push_back(score);
-			cout << score << endl;
+			//cout << score << endl;
 		}
 	}
 	//view

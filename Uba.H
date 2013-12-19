@@ -11,46 +11,41 @@ using namespace std;
 
 class Entry{
 public:
+	string timestamp;
 	string src_ip;
-	string pattern;
-	string result;
-	//
 	string host;
-	string table;
-	//
+	string type;
 	string action;
-	Entry( string src_ip, string pattern, string result){
+	//
+	//string pattern;
+	//string result;
+	//
+	//for log
+	string url;
+	string title;
+	string object;
+	//
+	Entry( string timestamp, string src_ip, string host){
+		this->timestamp = timestamp;
 		this->src_ip = src_ip;
-		this->pattern = pattern;
-		this->result = result;
+		this->host = host;
+		this->action = "access";
 	}
 };
 
-
-class Record{
-public:
-	string dst_ip;
-	string host;
-	string table;
-	Record(string dst_ip,string host,string table){
-		this->dst_ip=dst_ip;
-		this->host=host;
-		this->table=table;
-	}
-};
 
 class UrlAction{
 private:
 	string method;
 	string host;
 	string url;
-	string referer;
 	string action;
 	string data;
+	string referer;
 public:
-	string getHost(){return host;}
-	string getUrl(){return url;}
-	string getAction(){return action;}
+	string getHost(){return this->host;}
+	string getUrl(){return this->url;}
+	string getAction(){return this->action;}
 	UrlAction(string host, string url, string action){
 		this->host=host;
 		this->url=url;
@@ -60,21 +55,26 @@ public:
 
 //User Behavior Accumulation
 class Uba{
+	//Entry *entry;
+
+	//vector<Record> record_list;
+	map<string,string> record_map;
+	map<string,string>::iterator mit;
+
 	string before_timestamp;
 	vector<string> except_extension;
 	vector<UrlAction> url_action_list;
-	vector<Record> record_list;
 public:
 	Uba();
 	void Proc();
 	//vyatta
 	pqxx::result* getResult(string query);
-
-	bool setHostTable(string dst_ip, Entry *entry);
 	bool extension_filter( string result );
 
-	void update_shoptable( Entry *entry );
+	void AnalyzeAction( pqxx::result::const_iterator c, Entry *entry);
 
+	void CountTable( Entry *entry );
+	void LogTable( Entry *entry );
 	void VyattaProc();
 };
 
