@@ -141,11 +141,15 @@ void Uba::AnalyzeAction( pqxx::result::const_iterator c, Entry *entry){
 	cout <<"Uba::AnalyzeActions() start!"<<endl;
 	//entry->type 	  = c[0].as( string() );	
 	//entry-> = c[0].as( string() );
-
-	entry->url = "http://" + entry->host + c[4].as(string());
-	
+	string uri = c[4].as(string());
+	cout << uri << endl;
+	if( uri.find(" HTTP/",0) != string::npos){
+		uri.resize( uri.find(" HTTP/",0) );
+		cout << uri << endl;
+	}
+	entry->url = "http://" + entry->host + uri;
 	for( vector<UrlAction>::iterator it = url_action_list.begin(); it != url_action_list.end(); it++){
-		if( it->getHost()==entry->host && c[3].as(string())=="POST "  && c[4].as(string()).find( it->getUrl(),0 ) != string::npos ){
+		if( it->getHost()==entry->host && c[3].as(string())=="POST "  && uri.find( it->getUrl(),0 ) != string::npos ){
 			RED cout << it->getAction() << "!! src_ip=" + entry->src_ip +" in host="+ entry->host <<endl; RESET
 			entry->action = it->getAction();
 			entry->type = "EC";
@@ -153,8 +157,6 @@ void Uba::AnalyzeAction( pqxx::result::const_iterator c, Entry *entry){
 			break;
 		}
 	}
-	
-
 }
 
 //Log to action_log table
@@ -177,7 +179,7 @@ void Uba::CountTable( Entry *entry ){
 	result *res = getResult("select src_ip from action_count where src_ip='"+ entry->src_ip +"' and host='"+ entry->host +"'");
 	if(res->size()==0){
 		RED cout << "INSERT!!" + entry->src_ip << " in host="<< entry->host <<endl; RESET
-		getResult("insert into action_count(src_ip,host,access_day,access_month,cart,buy) values('"+ entry->src_ip +"','"+ entry->host +"',0,0,0,0)" );
+		getResult("insert into action_count(src_ip,host,access_day,access_month,cart,buy,train_flag) values('"+ entry->src_ip +"','"+ entry->host +"',0,0,0,0,0)" );
 	}
 	//RED cout << "ACCESS!!" + entry->src_ip + " in host=" << entry->host <<endl; RESET
 	//getResult("update action_count set access_day=access_day+1 where src_ip='"+ entry->src_ip +"' and host='"+ entry->host +"'");

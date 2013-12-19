@@ -18,7 +18,7 @@ pqxx::result* UserClassifier::getResult(string query){
 
 /* initiation of jubaclassifier */
 UserClassifier::UserClassifier(){
-	this->jubatus_connection = true;
+	this->jubatus_connection = false;
 	RED cout<<"UserClassifier::UserClassifier() start!"<<endl;	RESET
 
 	if(this->jubatus_connection){
@@ -49,7 +49,7 @@ datum UserClassifier::make_datum(int access_month, int cart, int buy) {
 void UserClassifier::Proc(){
 	RED cout<<"UserClassifier::Proc() start!"<<endl;	RESET
 	result *result_list;
-	result_list = getResult("select src_ip,access_day,access_month,cart,buy from action_count where train_flag=1");
+	result_list = getResult("select src_ip,host,access_day,access_month,cart,buy from action_count where train_flag=0");
 	
 	//evaluation
 	vector<double> score_list;
@@ -57,7 +57,7 @@ void UserClassifier::Proc(){
 		//Mode:Jubatus 
 		vector<datum> test_data;
 		for( result::const_iterator c = result_list->begin(); c != result_list->end(); c++ ){
-			test_data.push_back( make_datum( c[0].as(int()), c[1].as(int()), c[2].as(int()) ) );
+			test_data.push_back( make_datum( c[2].as(int()), c[3].as(int()), c[4].as(int()) ) );
 		}
 
 		vector<vector<estimate_result> > results = jubatus_classifier->classify("test", test_data);
@@ -71,14 +71,20 @@ void UserClassifier::Proc(){
 	}else{
 		//Mode:original scoring
 		double score;
+		cout << "original scoring!!!"<<endl;
 		for( result::const_iterator c = result_list->begin(); c != result_list->end(); c++ ){
-			score =  c[0].as(int()) + c[1].as(int()) + c[2].as(int());
-			score_list.push_back(score);
-			//cout << score << endl;
+			score =  c[2].as(int()) + c[3].as(int()) + c[4].as(int());
+			//score_list.push_back(score);
+			getResult("update action_count set score=" + c[4].as(string()) + " where src_ip='"+  c[0].as(string()) + "' and host='"+ c[1].as(string()) +"'");
+			cout<<"update action_count set score=" + c[4].as(string()) + " where src_ip='"+  c[0].as(string()) + "' and host='"+ c[1].as(string()) +"'"<<endl;
 		}
 	}
-	//view
+
+	//view	
+/*
+	for( vector<double>::iterator it = score_list.begin(); it != score_list.end(); it++ ){
+		cout << *it <<endl;
+		getResult("update action_count set score=" + *it + " where src_ip='"+  c[0].as(string()) + "' and host='"+ c[1].as(string()) +"'");
+	}
+*/
 }
-
-
-

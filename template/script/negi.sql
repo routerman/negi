@@ -359,6 +359,7 @@ CREATE TABLE action_count(
 	 access_time_month integer,
     cart integer,
     buy integer,
+    score double precision,
     class text,
 	 train_flag integer
 );
@@ -456,16 +457,16 @@ COPY url_action (id, host, method, url, referer, action, data) FROM stdin;
 -- Data for Name: rule; Type: TABLE DATA; Schema: public; 
 --
 
-COPY action_count ( id, src_ip, host, access_day, access_time_day, access_month, access_time_month, cart, buy, class, train_flag) FROM stdin;
-1	\N	\N	50	\N	90	\N	50	10	Good	1
-2	\N	\N	60	\N	90	\N	50	5	Good	1
-3	\N	\N	90	\N	90	\N	50	3	Good	1
-4	\N	\N	80	\N	3	\N	3	0	Bad	1
-5	\N	\N	90	\N	5	\N	6	0	Bad	1
-6	\N	\N	90	\N	0	\N	0	0	Bad	1
-7	\N	\N	30	\N	0	\N	0	0	New	1
-8	\N	\N	10	\N	0	\N	0	0	New	1
-9	\N	\N	20	\N	0	\N	0	0	New	1
+COPY action_count ( id, src_ip, host, access_day, access_time_day, access_month, access_time_month, cart, buy, score, class, train_flag) FROM stdin;
+1	\N	\N	50	\N	90	\N	50	10	\N	Good	1
+2	\N	\N	60	\N	90	\N	50	5	\N	Good	1
+3	\N	\N	90	\N	90	\N	50	3	\N	Good	1
+4	\N	\N	80	\N	3	\N	3	0	\N	Bad	1
+5	\N	\N	90	\N	5	\N	6	0	\N	Bad	1
+6	\N	\N	90	\N	0	\N	0	0	\N	Bad	1
+7	\N	\N	30	\N	0	\N	0	0	\N	New	1
+8	\N	\N	10	\N	0	\N	0	0	\N	New	1
+9	\N	\N	20	\N	0	\N	0	0	\N	New	1
 \.
 
 
