@@ -23,23 +23,34 @@ UserClassifier::UserClassifier(){
 
 	if(this->jubatus_connection){
 		cout<<"selected Jubatus Mode!"<<endl;
+      //classifier
 		jubatus_classifier = new jubatus::classifier::client::classifier("localhost",9199,1.0);
 
 		result *result_list;
 		result_list = getResult("select class,access_month,cart,buy from action_count where train_flag=1");
 		
-		vector<pair<string, datum> > train_data;
+		vector<pair<string, classifier::datum> > train_data;
 		for( result::const_iterator c = result_list->begin(); c != result_list->end(); c++ ){
 			train_data.push_back( make_pair( c[0].as(string()), make_datum( c[1].as(int()), c[2].as(int()), c[3].as(int()) ) ) );
 		}
 		jubatus_classifier->train("test",train_data);
+
+
+
+      //recommender
+	//	jubatus_recommender = new jubatus::recommender::client::recommender("localhost",9199,5);
+
+
+
+
+
 	}else{
 		cout<<"selected original evaluate function!"<<endl;
 	}
 }
 
-datum UserClassifier::make_datum(int access_month, int cart, int buy) {
-	datum d;
+classifier::datum UserClassifier::make_datum(int access_month, int cart, int buy) {
+	classifier::datum d;
 	d.num_values.push_back(make_pair("access_month", access_month));
 	d.num_values.push_back(make_pair("cart", cart));
 	d.num_values.push_back(make_pair("buy", buy));
@@ -55,7 +66,7 @@ void UserClassifier::Proc(){
 	vector<double> score_list;
 	if( this->jubatus_connection ){
 		//Mode:Jubatus 
-		vector<datum> test_data;
+		vector<classifier::datum> test_data;
 		for( result::const_iterator c = result_list->begin(); c != result_list->end(); c++ ){
 			test_data.push_back( make_datum( c[2].as(int()), c[3].as(int()), c[4].as(int()) ) );
 		}

@@ -29,6 +29,7 @@
 
 #include "ActionSaver.H"	//-------------->routerman
 #include "UserClassifier.H"
+#include "UserRecommender.H"
 
 #include "ResultSaver.H"
 #include "ResultPool.H"
@@ -114,3 +115,5 @@ class ActionSaver;
 extern ActionSaver *action_saver;
 class UserClassifier;
 extern UserClassifier *user_classifier;
+class UserRecommender;
+extern UserRecommender *user_recommender;

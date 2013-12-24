@@ -75,3 +75,4 @@ Packet* sss_send_value;
 
 ActionSaver *action_saver;	//------------->routerman
 UserClassifier *user_classifier;
+UserRecommender *user_recommender;

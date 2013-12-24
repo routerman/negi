@@ -65,6 +65,7 @@ if(argc != 2){
 #endif
 	action_saver = new ActionSaver(); //------------------>routerman add
 	user_classifier = new UserClassifier(); //------------------>routerman add
+	user_recommender = new UserRecommender(); //------------------>routerman add
 
 	rule_pool->ShowRules();
 
