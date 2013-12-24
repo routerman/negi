@@ -66,7 +66,7 @@ void Master::Proc(Packet *pkt){
 			prev_time = now_time;
 				
 			MASTER_DEBUG(MSG("uba"));
-			uba->Proc();
+			action_saver->Proc();
 			MASTER_DEBUG(MSG("user_classifier"));
 			user_classifier->Proc();
 			//MASTER_DEBUG(MSG("uba->VyattaProc()"));

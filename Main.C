@@ -63,7 +63,7 @@ if(argc != 2){
 	rule_loader_file = new RuleLoaderFile;
 	rule_loader_file->Proc();
 #endif
-	uba = new Uba(); //------------------>routerman add
+	action_saver = new ActionSaver(); //------------------>routerman add
 	user_classifier = new UserClassifier(); //------------------>routerman add
 
 	rule_pool->ShowRules();
