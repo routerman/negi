@@ -64,6 +64,8 @@ bool ActionSaver::extension_filter( string result ){
 
 void ActionSaver::Proc(){
 	Entry *entry;
+	string host;
+	bool find_record;
 	RED cout<<"ActionSaver::Proc() start"<<endl; RESET
 	cout  << before_timestamp << endl;
 	result *result_list = getResult("select timestamp,src_ip,dst_ip,pattern,result from save_result where timestamp>='"+ before_timestamp +"' and ( pattern='GET ' or pattern='POST ' )");
@@ -71,8 +73,14 @@ void ActionSaver::Proc(){
 	for( result::const_iterator c = result_list->begin(); c != result_list->end(); ++c ){
 		//search host from record_map
 		mit = record_map.find( c[2].as(string()) );
-		if ( mit == record_map.end() ) continue;
-		string host = (*mit).second;
+		//if ( mit == record_map.end() ) continue;
+		if ( mit == record_map.end() ){
+			host=c[2].as( string() );
+			find_record=false;
+		}else{
+			host = (*mit).second;
+			find_record=true;
+		}
 		//extension_filter
 		if ( extension_filter( c[4].as(string()) ) == true ) continue;
 
@@ -81,7 +89,7 @@ void ActionSaver::Proc(){
 		entry = new Entry( c[0].as(string()), c[1].as(string()), host);
 		//cout<<"timestamp="<< entry->timestamp <<": src_ip="<< entry->src_ip <<": host="<< entry->host<<endl;
 		//Analyze
-		AnalyzeAction(c, entry);
+		if( find_record )AnalyzeAction(c, entry);
 		//write Log Table
 		LogTable(entry);
 		//write count table
