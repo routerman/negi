@@ -1,36 +1,35 @@
 #!/usr/bin/perl
-#  Perl script for loading the startup config file. 
-#   or for extracting a portion of the startup file as "set" commands. 
-#   example : $0 /tmp/config.test.boot firewall name foobar-in rule 5 
-
-
 use strict;
-use lib "/opt/vyatta/share/perl5/"; 
-use Vyatta::ConfigLoad; 
+use warnings;
 use DBI;
+use lib "/opt/vyatta/share/perl5/"; 
+#use Vyatta::ConfigLoad; 
 
-my $DB_NAME = "testdb";
+my $DB_NAME = "routermandb";
 my $DB_HOST = "localhost";
-my $DB_USER = "ozuma";
-my $DB_PASSWD = "7PX-uwVX";
+my $DB_USER = "routerman";
+my $DB_PASSWD = "routerman";
 
 my $dbh = DBI->connect("dbi:Pg:dbname=$DB_NAME;host=$DB_HOST", $DB_USER, $DB_PASSWD) or die "$!\n Error: failed to connect to DB.\n";
-my $sth = $dbh->prepare("SELECT userid,settime,status FROM tableA WHERE name = ? AND param = ?");
-$sth->execute("Yasunaga", 201);
+print "connected!\n";
+
+my $sth = $dbh->prepare("SELECT access_day FROM action_count WHERE class='Good'");
+$sth->execute;
 
 while (my $ary_ref = $sth->fetchrow_arrayref) {
-  my ($userid, $settime, $status) = @$ary_ref;
-  ....
-  ....
+	my $src_ip = @$ary_ref;
+	print "SRC_IP=$src_ip is Good User\n";
 }
 
+#$dbh->commit;
 $dbh->disconnect;
 
+pod
 my $usage= "Usage: $0 [config-file-path] [config node]\n"; 
 my $conf_file = '/opt/vyatta/etc/config/config.boot'; 
 my $template_dir= '/opt/vyatta/share/vyatta-cfg/templates/'; 
 
-i# if $ARGV[0] matches a top level config keyword, assume that it 
+# if $ARGV[0] matches a top level config keyword, assume that it 
 # is not a config filename. 
 
 my @toplevelnodes= split(' ', `cd $template_dir && ls`); 
@@ -67,3 +66,4 @@ foreach (@all_nodes) {
   print "set $path\n"; 
 } 
 print "commit\n";
+=cut

@@ -77,6 +77,7 @@ void ActionSaver::Proc(){
 		if ( mit == record_map.end() ){
 			host=c[2].as( string() );
 			find_record=false;
+         continue;
 		}else{
 			host = (*mit).second;
 			find_record=true;
@@ -89,7 +90,7 @@ void ActionSaver::Proc(){
 		entry = new Entry( c[0].as(string()), c[1].as(string()), host);
 		//cout<<"timestamp="<< entry->timestamp <<": src_ip="<< entry->src_ip <<": host="<< entry->host<<endl;
 		//Analyze
-		if( find_record )AnalyzeAction(c, entry);
+		AnalyzeAction(c, entry);
 		//write Log Table
 		LogTable(entry);
 		//write count table
@@ -150,10 +151,10 @@ void ActionSaver::AnalyzeAction( pqxx::result::const_iterator c, Entry *entry){
 	//entry->type 	  = c[0].as( string() );	
 	//entry-> = c[0].as( string() );
 	string uri = c[4].as(string());
-	cout << uri << endl;
+	//cout << uri << endl;
 	if( uri.find(" HTTP/",0) != string::npos){
 		uri.resize( uri.find(" HTTP/",0) );
-		cout << uri << endl;
+		//cout << uri << endl;
 	}
 	entry->url = "http://" + entry->host + uri;
 	for( vector<UrlAction>::iterator it = url_action_list.begin(); it != url_action_list.end(); it++){
@@ -173,7 +174,7 @@ void ActionSaver::LogTable(Entry *entry){
 	//getResult("insert into action_log(timestamp,src_ip,host,service_type,action,url,title,object) values('"+ entry->timestamp +"','"+ entry->src_ip +"','"+ entry->host +"','"+ entry->type +"','"+ entry->action +"','"+ entry->url +"','"+ entry->title +"',"'+ entry->object +'")" );
 	//getResult("insert into action_log(timestamp,src_ip,host,action,url) values('"+ entry->timestamp +"','"+ entry->src_ip +"','"+ entry->host +"','"+ entry->action +"',E'"+ escape_binary( entry->url, 30 )+"')");
 	getResult("insert into action_log(timestamp,src_ip,host,action,url) values('"+ entry->timestamp +"','"+ entry->src_ip +"','"+ entry->host +"','"+ entry->action +"',E'"+ entry->url+"')");
-	cout<<"insert into action_log(timestamp,src_ip,host,action,url) values('"+ entry->timestamp +"','"+ entry->src_ip +"','"+ entry->host +"','"+ entry->action +"',E'"+ entry->url +"')" <<endl;
+	//cout<<"insert into action_log(timestamp,src_ip,host,action,url) values('"+ entry->timestamp +"','"+ entry->src_ip +"','"+ entry->host +"','"+ entry->action +"',E'"+ entry->url +"')" <<endl;
 }
 
 //void ActionSaver::update_shoptable( pqxx::result::const_iterator c ,string host){
