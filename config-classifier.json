@@ -13,5 +13,5 @@
       { "key" : "*", "type" : "num" }
     ]
   },
-  "method" : "PA"
+  "method" : "perceptron"
 }

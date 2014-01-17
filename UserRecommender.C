@@ -17,6 +17,7 @@ pqxx::result* UserRecommender::getResult(string query){
 
 void UserRecommender::Proc(){
    if(server_connection){
+/*
       result *result_list;
       result_list = getResult("select src_ip from action_count where train_flag=1");
       for( result::const_iterator c = result_list->begin(); c != result_list->end(); c++ ){
@@ -28,11 +29,13 @@ void UserRecommender::Proc(){
          }
          cout << endl;
       }
+*/
    }
 }
 
 UserRecommender::UserRecommender(){
    server_connection=false;
+/*
    if(server_connection){
       jubatus_recommender = new jubatus::recommender::client::recommender("localhost",19199,5);
       recommender::datum d;
@@ -44,5 +47,6 @@ UserRecommender::UserRecommender(){
          jubatus_recommender->update_row("recommender_ml", c[0].as(string()), d);
       }          
    }
+*/
 }
 

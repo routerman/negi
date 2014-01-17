@@ -6,10 +6,14 @@
 #include <jubatus/client/recommender_types.hpp>
 #include <pficommon/lang/util.h>
 
+
 using namespace std;
 using namespace jubatus;
 using namespace jubatus::recommender;
 using namespace pfi::lang;
+
+//using jubatus::clinet::common::datum;
+//using jubatus::recommender::client::recommender;
 //using jubatus::recommender::datum;
 
 class UserRecommender{

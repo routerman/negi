@@ -24,21 +24,21 @@ UserClassifier::UserClassifier(){
 	if(this->jubatus_connection){
 		cout<<"selected Jubatus Mode!"<<endl;
       //classifier
-		jubatus_classifier = new jubatus::classifier::client::classifier("localhost",9199,1.0);
+		jubatus_classifier = new jubatus::classifier::client::classifier("localhost",9199,"test",1.0);
 
 		//result *result_list = getResult("select class,access_month,cart,buy from action_count where train_flag=1");
 		
-		vector<pair<string, classifier::datum> > train_data;
+		vector< classifier::labeled_datum > train_data;
 /*
 		for( result::const_iterator c = result_list->begin(); c != result_list->end(); c++ ){
 			train_data.push_back( make_pair( c[0].as(string()), make_datum( c[1].as(int()), c[2].as(int()), c[3].as(int()) ) ) );
 		}
 */
-		train_data.push_back( make_pair( "Good", make_datum(30,0,0) ) );
-		train_data.push_back( make_pair( "Bad", make_datum(0,0,0) ) );
-		jubatus_classifier->train("test",train_data);
+		train_data.push_back( classifier::labeled_datum( "Good", make_datum(30,0,0) ) );
+		train_data.push_back( classifier::labeled_datum(  "Bad", make_datum(0,0,0) ) );
+		jubatus_classifier->train(train_data);
 
-      //recommender
+      //recommendeclassifier:classifier:classifier:classifier:classifier::::::r
 	   //jubatus_recommender = new jubatus::recommender::client::recommender("localhost",9199,5);
 
 	}else{
@@ -46,11 +46,11 @@ UserClassifier::UserClassifier(){
 	}
 }
 
-classifier::datum UserClassifier::make_datum(int access_day, int cart, int buy) {
-	classifier::datum d;
-	d.num_values.push_back(make_pair("access_day", access_day));
-	d.num_values.push_back(make_pair("cart", cart));
-	d.num_values.push_back(make_pair("buy", buy));
+datum UserClassifier::make_datum(int access_day, int cart, int buy) {
+   datum d;
+	d.add_number("access_day", access_day);
+	d.add_number("cart", cart);
+	d.add_number("buy", buy);
 	return d;
 }
 
@@ -63,7 +63,7 @@ void UserClassifier::Proc(){
 	vector<double> score_list;
 	if( this->jubatus_connection ){
 		//Mode:Jubatus 
-		vector<classifier::datum> test_data;
+		vector<datum> test_data;
 		for( result::const_iterator c = result_list->begin(); c != result_list->end(); c++ ){
 			test_data.push_back( make_datum( c[2].as(int()), 0, 0) );
 		}
@@ -71,7 +71,7 @@ void UserClassifier::Proc(){
 		string sscore;
 		int i=0;
       cout <<"send to jubaclassifier!"<<endl;
-      vector<vector<estimate_result> > results = jubatus_classifier->classify("test", test_data);
+      vector<vector<estimate_result> > results = jubatus_classifier->classify(test_data);
       cout <<"HOGEHOGEHOGE!"<<endl;
 		for( result::const_iterator c = result_list->begin(); c != result_list->end(); c++ ){
 			const estimate_result& good = results[i][0];

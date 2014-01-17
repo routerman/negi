@@ -25,7 +25,7 @@ INC=
 
 
 #LIB=-lpqxx -lpcap -lz
-LIB=-lpqxx -lpcap -lz `pkg-config pficommon --libs --cflags` -lmsgpack -ljubatus_mpio -ljubatus_msgpack-rpc
+LIB=-lpqxx -lpcap -lz `pkg-config jubatus-client --libs --cflags` -lmsgpack -ljubatus_mpio -ljubatus_msgpack-rpc
 
 
 #LIB= -pthread -lpcap -lz
