@@ -24,11 +24,23 @@ ActionSaver::ActionSaver(){
 	cout << before_timestamp << endl;
 
 	//Initiation RecordList
+   /*
 	result_list = getResult("select dst_ip,host from record");
 	for( result::const_iterator c = result_list->begin(); c != result_list->end(); c++ ){
 		record_map.insert( make_pair( c[0].as(string()), c[1].as(string()) ) );
 		//cout << c[0].as(string()) <<":"<< c[1].as(string()) << endl;
 	}
+   */
+	record_map.insert( make_pair( "54.240.248.0","www.amazon.co.jp" ) );
+	record_map.insert( make_pair( "202.72.50.10","www.rakuten.co.jp" ) );
+	record_map.insert( make_pair( "202.32.114.47","www.nitori-net.jp" ) );
+	record_map.insert( make_pair( "210.129.151.129","kakaku.com" ) );
+	record_map.insert( make_pair( "202.247.10.161","www.takashimaya.co.jp" ) );
+	record_map.insert( make_pair( "69.171.229.25","www.facebook.com" ) );
+	record_map.insert( make_pair( "203.216.231.189","www.yahoo.co.jp" ) );
+	record_map.insert( make_pair( "208.80.154.224","ja.wikipedia.org" ) );
+	record_map.insert( make_pair( "210.189.86.12","ejje.weblio.jp" ) );
+	record_map.insert( make_pair( "131.113.134.163","www.itc.keio.ac.jp" ) );
 	record_map.insert( make_pair("not","found") );
 
 	//Initiation UrlActionList
@@ -55,7 +67,7 @@ ActionSaver::ActionSaver(){
 bool ActionSaver::extension_filter( string result ){
 	for( unsigned int i=0; i<except_extension.size(); i++){
 		if( result.find( except_extension[i],0 ) != string::npos ){
-			cout<<"exception!"<< except_extension[i] << endl;
+			//cout<<"exception!"<< except_extension[i] << endl;
 			return true;
 		}
 	}
@@ -63,9 +75,8 @@ bool ActionSaver::extension_filter( string result ){
 }
 
 void ActionSaver::Proc(){
-	Entry *entry;
 	string host;
-	bool find_record;
+   Entry *entry;
 	RED cout<<"ActionSaver::Proc() start"<<endl; RESET
 	cout  << before_timestamp << endl;
 	result *result_list = getResult("select timestamp,src_ip,dst_ip,pattern,result from save_result where timestamp>='"+ before_timestamp +"' and ( pattern='GET ' or pattern='POST ' )");
@@ -76,11 +87,9 @@ void ActionSaver::Proc(){
 		//if ( mit == record_map.end() ) continue;
 		if ( mit == record_map.end() ){
 			host=c[2].as( string() );
-			find_record=false;
          continue;
 		}else{
 			host = (*mit).second;
-			find_record=true;
 		}
 		//extension_filter
 		if ( extension_filter( c[4].as(string()) ) == true ) continue;
@@ -147,7 +156,7 @@ void ActionSaver::Proc( Packet *pkt ){
 void ActionSaver::AnalyzeAction( pqxx::result::const_iterator c, Entry *entry){
 	//ここでデータベースに挿入できる形までentryを加工する
 	//type,actions,url,titile,object
-	cout <<"ActionSaver::AnalyzeActions() start!"<<endl;
+	//cout <<"ActionSaver::AnalyzeActions() start!"<<endl;
 	//entry->type 	  = c[0].as( string() );	
 	//entry-> = c[0].as( string() );
 	string uri = c[4].as(string());
@@ -170,7 +179,7 @@ void ActionSaver::AnalyzeAction( pqxx::result::const_iterator c, Entry *entry){
 
 //Log to action_log table
 void ActionSaver::LogTable(Entry *entry){
-	RED cout<<"ActionSaver::LogTable() start!"<<endl; RESET
+	//RED cout<<"ActionSaver::LogTable() start!"<<endl; RESET
 	//getResult("insert into action_log(timestamp,src_ip,host,service_type,action,url,title,object) values('"+ entry->timestamp +"','"+ entry->src_ip +"','"+ entry->host +"','"+ entry->type +"','"+ entry->action +"','"+ entry->url +"','"+ entry->title +"',"'+ entry->object +'")" );
 	//getResult("insert into action_log(timestamp,src_ip,host,action,url) values('"+ entry->timestamp +"','"+ entry->src_ip +"','"+ entry->host +"','"+ entry->action +"',E'"+ escape_binary( entry->url, 30 )+"')");
 	getResult("insert into action_log(timestamp,src_ip,host,action,url) values('"+ entry->timestamp +"','"+ entry->src_ip +"','"+ entry->host +"','"+ entry->action +"',E'"+ entry->url+"')");
@@ -179,7 +188,7 @@ void ActionSaver::LogTable(Entry *entry){
 
 //void ActionSaver::update_shoptable( pqxx::result::const_iterator c ,string host){
 void ActionSaver::CountTable( Entry *entry ){
-	RED cout<<"ActionSaver::CountTable() start!"<<endl; RESET
+	//RED cout<<"ActionSaver::CountTable() start!"<<endl; RESET
 	//RED cout<<"ActionSaver::update_shoptable() start"<<endl; RESET
 	//アクセスカウント。ホントはこう書きたい。
 	//if( getResult( "update user_shop_actions set access_day=access_day+1 where src_ip='"+it[0].as( string() )+"' and host='"+host+"'") ){

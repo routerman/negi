@@ -435,13 +435,16 @@ COPY rule (id, owner, expire_date, src_ip, src_netmask, src_port, dst_ip, dst_ne
 --
 
 COPY record (dst_ip, host) FROM stdin;
-54.240.248.0	www.amazon.co.jp
-202.72.50.10	www.rakuten.co.jp
-202.32.114.47	www.nitori-net.jp
-210.129.151.129	kakaku.com
-202.247.10.161	www.takashimaya.co.jp
-69.171.229.25	www.facebook.com
-203.216.231.189	www.yahoo.co.jp
+54.240.248.0   www.amazon.co.jp
+202.72.50.10   www.rakuten.co.jp
+202.32.114.47  www.nitori-net.jp
+210.129.151.129   kakaku.com
+202.247.10.161 www.takashimaya.co.jp
+69.171.229.25  www.facebook.com
+203.216.231.189   www.yahoo.co.jp
+208.80.154.224 ja.wikipedia.org
+210.189.86.12  ejje.weblio.jp
+131.113.134.163   www.itc.keio.ac.jp
 \.
 
 --
@@ -457,17 +460,12 @@ COPY url_action (id, host, method, url, referer, action, data) FROM stdin;
 -- Data for Name: rule; Type: TABLE DATA; Schema: public; 
 --
 
-COPY action_count ( id, src_ip, host, access_day, access_time_day, access_month, access_time_month, cart, buy, score, class, train_flag) FROM stdin;
-1	\N	\N	50	\N	90	\N	50	10	\N	Good	1
-2	\N	\N	60	\N	90	\N	50	5	\N	Good	1
-3	\N	\N	90	\N	90	\N	50	3	\N	Good	1
-4	\N	\N	80	\N	3	\N	3	0	\N	Bad	1
-5	\N	\N	90	\N	5	\N	6	0	\N	Bad	1
-6	\N	\N	90	\N	0	\N	0	0	\N	Bad	1
-7	\N	\N	30	\N	0	\N	0	0	\N	New	1
-8	\N	\N	10	\N	0	\N	0	0	\N	New	1
-9	\N	\N	20	\N	0	\N	0	0	\N	New	1
-\.
+
+
+--COPY action_count ( id, src_ip, host, access_day, access_time_day, access_month, access_time_month, cart, buy, score, class, train_flag) FROM stdin;
+--1  \N \N 50 \N 0  \N 0  0  \N Good  1
+--2  \N \N 0  \N 0  \N 0  0  \N Bad   1
+--\.
 
 
 ---------------------->routerman end!

@@ -1,6 +1,5 @@
 #include "UserRecommender.H"
 
-
 pqxx::result* UserRecommender::getResult(string query){
    result *result_list;
    try{
@@ -35,7 +34,7 @@ void UserRecommender::Proc(){
 UserRecommender::UserRecommender(){
    server_connection=false;
    if(server_connection){
-      jubatus_recommender = new jubatus::recommender::client::recommender("localhost",9199,5);
+      jubatus_recommender = new jubatus::recommender::client::recommender("localhost",19199,5);
       recommender::datum d;
       result *result_list;
       result_list = getResult("select src_ip,host,score from action_count where train_flag=1");
