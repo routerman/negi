@@ -4,7 +4,7 @@ count=`ps -ef | grep jubaclassifier | grep -v grep | wc -l`
 if [ $count = 0 ];
 then
    echo "jubaclassifier is dead."
-   jubaclassifier --configpath config-classifier.json --rpc-port 19198 &
+   jubaclassifier --configpath config-classifier.json &
    until [ $count = 0 ]; 
    do
       count=`ps -ef | grep jubaclassifier | grep -v grep | wc -l`

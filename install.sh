@@ -17,16 +17,19 @@ if [ $# -ne 2 ]; then
 fi
 echo "deb http://ftp.jp.debian.org/debian/ squeeze main" >> /etc/apt/sources.list #PostgreSQL8.4
 echo "deb http://download.jubat.us/apt binary/" >> /etc/apt/sources.list.d/jubatus.list #jubatus 0.4.5
-apt-get update
-apt-get install aptitude jubatus="0.4*"
-aptitude update
-aptitude install git g++ libboost-dev libpqxx3-dev zlib1g-dev libpcap-dev libboost-all-dev postgresql-8.4 phppgadmin build-essential -y
 
 cat << END >> /etc/apt/preferences
 Package: jubatus
 Pin: version 0.4*
 Pin-Priority: 1001
 END
+
+apt-get update
+apt-get install aptitude
+
+aptitude update
+aptitude install git g++ libboost-dev libpqxx3-dev zlib1g-dev libpcap-dev libboost-all-dev postgresql-8.4 phppgadmin build-essential -y
+aptitude install  jubatus="0.4*"
 
 . /opt/jubatus/profile
 
@@ -38,9 +41,7 @@ psql -U postgres -c "create database $DBNAME"
 psql -U postgres -c "grant all privileges on database $DBNAME to $DBUSERNAME;"
 psql -U $DBUSERNAME $DBNAME < ./template/script/negi.sql
 
-make clean
-make dep
-make
+make clean && make dep && make
 
 #configuration pcap.conf
 

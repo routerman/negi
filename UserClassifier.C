@@ -24,7 +24,7 @@ UserClassifier::UserClassifier(){
 	if(this->jubatus_connection){
 		cout<<"selected Jubatus Mode!"<<endl;
       //classifier
-		jubatus_classifier = new jubatus::classifier::client::classifier("localhost",19198,1.0);
+		jubatus_classifier = new jubatus::classifier::client::classifier("localhost",9199,1.0);
 
 		//result *result_list = getResult("select class,access_month,cart,buy from action_count where train_flag=1");
 		
@@ -46,9 +46,9 @@ UserClassifier::UserClassifier(){
 	}
 }
 
-classifier::datum UserClassifier::make_datum(int access_month, int cart, int buy) {
+classifier::datum UserClassifier::make_datum(int access_day, int cart, int buy) {
 	classifier::datum d;
-	d.num_values.push_back(make_pair("access_month", access_month));
+	d.num_values.push_back(make_pair("access_day", access_day));
 	d.num_values.push_back(make_pair("cart", cart));
 	d.num_values.push_back(make_pair("buy", buy));
 	return d;
