@@ -18,7 +18,7 @@ pqxx::result* UserClassifier::getResult(string query){
 
 /* initiation of jubaclassifier */
 UserClassifier::UserClassifier(){
-	this->jubatus_connection = true;
+	this->jubatus_connection = false;
 	RED cout<<"UserClassifier::UserClassifier() start!"<<endl;	RESET
 
 	if(this->jubatus_connection){
@@ -38,6 +38,36 @@ UserClassifier::UserClassifier(){
 		train_data.push_back( classifier::labeled_datum(  "Bad", make_datum(0,0,0) ) );
 		jubatus_classifier->train(train_data);
 
+	   result *result_list;
+      result_list = getResult("select src_ip,host,access_day from action_count where train_flag=0");
+
+		vector<datum> test_data;
+		for( result::const_iterator c = result_list->begin(); c != result_list->end(); c++ ){
+			test_data.push_back( make_datum( c[2].as(int()), 0, 0) );
+		}
+
+      vector<vector<estimate_result> > results = jubatus_classifier->classify(test_data);
+      string sscore;
+      int i=0;
+/*
+		for( result::const_iterator c = result_list->begin(); c != result_list->end(); c++ ){
+			const estimate_result& good = results[i][0];
+			//const estimate_result& bad = results[i][1];
+         //sscore = good.score +"-"+bad.score;
+         sscore = good.score;
+         getResult("update action_count set score=" + sscore + " where src_ip='"+  c[0].as(string()) + "' and host='"+ c[1].as(string()) +"'");
+			cout<<"update action_count set score=" + sscore + " where src_ip='"+  c[0].as(string()) + "' and host='"+ c[1].as(string()) +"'"<<endl;
+			std::cout << std::endl;
+         i++;
+      }
+*/
+      for (size_t i = 0; i < results.size(); ++i) {
+         for (size_t j = 0; j < results[i].size(); ++j) {
+            const estimate_result& r = results[i][j];
+            std::cout << r.label << " " << r.score << std::endl;
+         }
+         std::cout << std::endl;
+      }
       //recommendeclassifier:classifier:classifier:classifier:classifier::::::r
 	   //jubatus_recommender = new jubatus::recommender::client::recommender("localhost",9199,5);
 
@@ -56,12 +86,11 @@ datum UserClassifier::make_datum(int access_day, int cart, int buy) {
 
 void UserClassifier::Proc(){
 	RED cout<<"UserClassifier::Proc() start!"<<endl; RESET
-	result *result_list;
-   result_list = getResult("select src_ip,host,access_day from action_count where train_flag=0");
-	
 	//evaluation
-	vector<double> score_list;
 	if( this->jubatus_connection ){
+	   vector<double> score_list;
+	   result *result_list;
+      result_list = getResult("select src_ip,host,access_day from action_count where train_flag=0");
 		//Mode:Jubatus 
 		vector<datum> test_data;
 		for( result::const_iterator c = result_list->begin(); c != result_list->end(); c++ ){
@@ -84,14 +113,16 @@ void UserClassifier::Proc(){
          i++;
 		}
 	}else{
+	   result *result_list;
+      result_list = getResult("select src_ip,host,access_day from action_count where train_flag=0");
 		//Mode:original scoring
 		//double score;
 		cout << "original scoring!!!"<<endl;
 		for( result::const_iterator c = result_list->begin(); c != result_list->end(); c++ ){
 			//double score =  c[2].as(int()) + c[3].as(int()) + c[4].as(int());
 			//score_list.push_back(score);
-			getResult("update action_count set score=" + c[4].as(string()) + " where src_ip='"+  c[0].as(string()) + "' and host='"+ c[1].as(string()) +"'");
-			cout<<"update action_count set score=" + c[4].as(string()) + " where src_ip='"+  c[0].as(string()) + "' and host='"+ c[1].as(string()) +"'"<<endl;
+			getResult("update action_count set score=" + c[2].as(string()) + " where src_ip='"+  c[0].as(string()) + "' and host='"+ c[1].as(string()) +"'");
+			cout<<"update action_count set score=" + c[2].as(string()) + " where src_ip='"+  c[0].as(string()) + "' and host='"+ c[1].as(string()) +"'"<<endl;
 		}
 	}
 
