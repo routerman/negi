@@ -29,8 +29,12 @@ aptitude install git g++ libboost-dev libpqxx3-dev zlib1g-dev libpcap-dev libboo
 sed -i -e s/ident/trust/ /etc/postgresql/8.4/main/pg_hba.conf
 /etc/init.d/postgresql restart
 
+#sed -i -e s/DBUSERNAME/$DBUSERNAME/ Makefile
+#sed -i -e s/DBNAME/$DBNAME/ Makefile
+
 psql -U postgres -c "create user $DBUSERNAME"
 psql -U postgres -c "create database $DBNAME"
+#psql -U postgres -c "alter role $DBUSERNAME with password '$DBUSERNAME'"
 psql -U postgres -c "grant all privileges on database $DBNAME to $DBUSERNAME;"
 psql -U $DBUSERNAME $DBNAME < ./template/script/negi.sql
 
@@ -43,7 +47,7 @@ type pcap
 filename test.pcap
 dbname $DBNAME
 dbuser $DBUSERNAME
-dbpass 
+dbpass
 dbhost localhost
 gc_remove_time 600
 END
@@ -54,7 +58,7 @@ type ether
 device eth0
 dbname $DBNAME
 dbuser $DBUSERNAME
-dbpass 
+dbpass
 dbhost localhost
 gc_remove_time 600
 END
@@ -67,3 +71,5 @@ END
 
 echo "オフラインモードで実行するにはtcpdump等でtest.pcapを用意し、./negi template/config/pcap.confを実行してください。"
 echo "オンラインモードで実行するには./negi template/config/eth0.confを実行してください。"
+
+echo "please reboot."

@@ -68,9 +68,9 @@ void Master::Proc(Packet *pkt){
 			MASTER_DEBUG(MSG("uba"));
 			action_saver->Proc();
 			MASTER_DEBUG(MSG("user_classifier"));
-			user_classifier->Proc();
-			MASTER_DEBUG(MSG("user_recommender"));
-			user_recommender->Proc();
+		   user_classifier->Proc();
+		   MASTER_DEBUG(MSG("user_recommender"));
+			//user_recommender->Proc();
 			//MASTER_DEBUG(MSG("uba->VyattaProc()"));
 			//uba->VyattaProc();	
 		}

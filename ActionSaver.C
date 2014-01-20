@@ -18,10 +18,14 @@ pqxx::result* ActionSaver::getResult(string query){
 ActionSaver::ActionSaver(){
 	result *result_list;
 	//Initiation timstamp
-	result_list = getResult("select CURRENT_TIMESTAMP(0) AT TIME ZONE 'JST'" );
-	result::const_iterator c = result_list->begin();
-	before_timestamp = c[0].as( string() );
+
+	//result_list = getResult("select CURRENT_TIMESTAMP(0) AT TIME ZONE 'JST'" );
+	//result::const_iterator c = result_list->begin();
+	//before_timestamp = c[0].as( string() );
+	before_timestamp ="2012-01-01 00:00:00";
 	cout << before_timestamp << endl;
+
+
 
 	//Initiation RecordList
    /*
@@ -75,21 +79,27 @@ bool ActionSaver::extension_filter( string result ){
 }
 
 void ActionSaver::Proc(){
+   bool analyze;
 	string host;
    Entry *entry;
 	RED cout<<"ActionSaver::Proc() start"<<endl; RESET
 	cout  << before_timestamp << endl;
 	result *result_list = getResult("select timestamp,src_ip,dst_ip,pattern,result from save_result where timestamp>='"+ before_timestamp +"' and ( pattern='GET ' or pattern='POST ' )");
+	//result *result_list = getResult("select timestamp,src_ip,dst_ip,pattern,result from save_result where ( pattern='GET ' or pattern='POST ' )");
 	//result *result_list = getResult("select src_ip,dst_ip,pattern,result from save_result where timestamp>='"+ before_timestamp +"' and pattern='POST '");
 	for( result::const_iterator c = result_list->begin(); c != result_list->end(); ++c ){
 		//search host from record_map
+		//cout<<"timestamp="<< c[0].as(string())<<": src_ip="<< c[1].as(string()) <<": dst_ip="<< c[2].as(string())<<endl;
+      before_timestamp = c[0].as( string() );
 		mit = record_map.find( c[2].as(string()) );
 		//if ( mit == record_map.end() ) continue;
 		if ( mit == record_map.end() ){
 			host=c[2].as( string() );
-         continue;
+         analyze = false;
+         //continue;
 		}else{
 			host = (*mit).second;
+         analyze = true;
 		}
 		//extension_filter
 		if ( extension_filter( c[4].as(string()) ) == true ) continue;
@@ -99,7 +109,7 @@ void ActionSaver::Proc(){
 		entry = new Entry( c[0].as(string()), c[1].as(string()), host);
 		//cout<<"timestamp="<< entry->timestamp <<": src_ip="<< entry->src_ip <<": host="<< entry->host<<endl;
 		//Analyze
-		AnalyzeAction(c, entry);
+		if(analyze)AnalyzeAction(c, entry);
 		//write Log Table
 		LogTable(entry);
 		//write count table
@@ -107,9 +117,9 @@ void ActionSaver::Proc(){
 		delete entry;
 	}
 	//update timestamp
-	result *tmp = getResult("select CURRENT_TIMESTAMP(0) AT TIME ZONE 'JST'" );
-	result::const_iterator c = tmp->begin();
-	before_timestamp = c[0].as( string() );
+	//result *tmp = getResult("select CURRENT_TIMESTAMP(0) AT TIME ZONE 'JST'" );
+	//result::const_iterator c = tmp->begin();
+	//before_timestamp = c[0].as( string() );
 	cout << before_timestamp << endl;
 	//conn->disconnect();
 	//RED cout<<"ActionSaver::Proc() end" <<endl; RESET
