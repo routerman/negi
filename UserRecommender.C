@@ -35,7 +35,7 @@ void UserRecommender::Proc(){
          jubatus_recommender->update_row(c[0].as(string()), d);
       }
       
-      result_list = getResult("select src_ip from action_count order by score limit 10");
+      result_list = getResult("select src_ip from action_count where host='202.255.47.226' order by score limit 5");
       //analysis
       for( result::const_iterator c = result_list->begin(); c != result_list->end(); c++ ){
          //int i = c[0].as(int());
@@ -46,6 +46,7 @@ void UserRecommender::Proc(){
          cout <<  "src_ip " << c[0].as(string()) << " is similar to :";
          for (size_t i = 1; i < sr.size(); ++i){
             cout <<  sr[i].id << ", ";
+            getResult("update action_count set score=score*2 where src_ip='"+  sr[i].id + "' and host='202.255.47.226'");
          }
          cout << endl;
       }

@@ -81,7 +81,7 @@ tar:
 	tar cvzf $(TARGET).tar.gz *.cc *.h makefile
 
 trunc:
-	psql -h localhost -U test -d testdb -c "truncate table save_stream; truncate table save_result; truncate table action_log; truncate table action_count; select setval('save_result_id_seq',1); select setval('save_data_id_seq',1); select setval('action_log_id_seq',1);select setval('user_id_seq',1);"
+	psql -h localhost -U routerman -d routermandb -c "truncate table save_stream; truncate table save_result; truncate table action_log; truncate table action_count; select setval('save_result_id_seq',1); select setval('save_data_id_seq',1); select setval('action_log_id_seq',1);select setval('user_id_seq',1);"
 
 debug:
 	make trunc

@@ -79,7 +79,11 @@ if(argc != 2){
 */
 
 ///*
-	packetcap();
+	//packetcap();
+
+   action_saver->Proc();
+   user_classifier->Proc();
+   user_recommender->Proc();
 //*/
 
 /*

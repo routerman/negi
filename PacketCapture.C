@@ -110,9 +110,6 @@ void packetcap(){
 
     /* close capture device */
     pcap_close(pd);
-   action_saver->Proc();
-   user_classifier->Proc();
-   user_recommender->Proc();
 
 	// close message queue
 //	while(packet_queue->GetQueueSize() != 0){

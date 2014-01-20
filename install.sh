@@ -38,6 +38,9 @@ psql -U postgres -c "alter role $DBUSERNAME with password '$DBUSERNAME'"
 psql -U postgres -c "grant all privileges on database $DBNAME to $DBUSERNAME;"
 psql -U $DBUSERNAME $DBNAME < ./template/script/negi.sql
 
+cpan -i DBI
+capn -i DBD::Pg
+
 make clean && make dep && make
 
 #configuration pcap.conf
@@ -73,3 +76,5 @@ echo "オフラインモードで実行するにはtcpdump等でpcapファイル
 echo "オンラインモードで実行するには./negi template/config/eth0.confを実行してください。"
 
 echo "please reboot."
+
+
