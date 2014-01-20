@@ -59,11 +59,14 @@ ActionSaver::ActionSaver(){
 	//url_action_list.push_back(*tmp);
 
 	except_extension.push_back(".jpg");
+	except_extension.push_back(".jpeg");
 	except_extension.push_back(".png");
 	except_extension.push_back(".gif");
 	except_extension.push_back(".ico");
 	except_extension.push_back(".css");
 	except_extension.push_back(".js");
+	except_extension.push_back("image");
+	except_extension.push_back("plugin");
 	//for( vector<string>::iterator it = except_extension.begin(); it!=except_extension; it++ ){}
 }
 

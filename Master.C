@@ -56,7 +56,7 @@ void Master::Proc(Packet *pkt){
 	static time_t prev_time;
 	static time_t now_time;
 
-	if(observer_packet_counter > 1000){
+	if(observer_packet_counter > 20000){
 		now_time = time(NULL);
 		if(now_time > prev_time){
 			cout << now_time - start_time << "	" ;
@@ -66,9 +66,9 @@ void Master::Proc(Packet *pkt){
 			prev_time = now_time;
 				
 			MASTER_DEBUG(MSG("uba"));
-			action_saver->Proc();
+			//action_saver->Proc();
 			MASTER_DEBUG(MSG("user_classifier"));
-		   user_classifier->Proc();
+		   //user_classifier->Proc();
 		   MASTER_DEBUG(MSG("user_recommender"));
 			//user_recommender->Proc();
 			//MASTER_DEBUG(MSG("uba->VyattaProc()"));

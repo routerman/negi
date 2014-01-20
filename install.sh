@@ -34,7 +34,7 @@ sed -i -e s/ident/trust/ /etc/postgresql/8.4/main/pg_hba.conf
 
 psql -U postgres -c "create user $DBUSERNAME"
 psql -U postgres -c "create database $DBNAME"
-#psql -U postgres -c "alter role $DBUSERNAME with password '$DBUSERNAME'"
+psql -U postgres -c "alter role $DBUSERNAME with password '$DBUSERNAME'"
 psql -U postgres -c "grant all privileges on database $DBNAME to $DBUSERNAME;"
 psql -U $DBUSERNAME $DBNAME < ./template/script/negi.sql
 
@@ -47,7 +47,7 @@ type pcap
 filename test.pcap
 dbname $DBNAME
 dbuser $DBUSERNAME
-dbpass
+dbpass $DBUSERNAME
 dbhost localhost
 gc_remove_time 600
 END
@@ -58,7 +58,7 @@ type ether
 device eth0
 dbname $DBNAME
 dbuser $DBUSERNAME
-dbpass
+dbpass $DBUSERNAME
 dbhost localhost
 gc_remove_time 600
 END
@@ -69,7 +69,7 @@ if [ -f /opt/jubatus/profile ];then
 fi
 END
 
-echo "オフラインモードで実行するにはtcpdump等でtest.pcapを用意し、./negi template/config/pcap.confを実行してください。"
+echo "オフラインモードで実行するにはtcpdump等でpcapファイルを用意し、template/config/pcap.confにパス名を追加し，./negi template/config/pcap.confを実行してください。"
 echo "オンラインモードで実行するには./negi template/config/eth0.confを実行してください。"
 
 echo "please reboot."

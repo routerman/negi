@@ -46,11 +46,30 @@ void UserClassifier::Proc(){
    RED cout<<"UserClassifier::Proc() start!"<<endl; RESET
       //evaluation
       if( this->jubatus_connection ){
+         result *result_list;
+         result_list = getResult("select src_ip,host,access_day from action_count where train_flag=0");
+         cout << "jubatus scoring!!!"<<endl;
 
          jubatus_classifier = new jubatus::classifier::client::classifier("localhost", 9199, "test", 1.0);
          vector<datum> test_data;
-         test_data.push_back(make_datum(5,0,0));
+         for( result::const_iterator c = result_list->begin(); c != result_list->end(); c++ ){
+            test_data.push_back(make_datum( c[2].as(int()), 0, 0));
+         }
+
          vector<vector<estimate_result> > results = jubatus_classifier->classify(test_data);
+         int id=0;
+         string sscore;
+         ostringstream oss;
+         for( result::const_iterator c = result_list->begin(); c != result_list->end(); c++ ){
+            oss << results[id][0].score;
+            sscore = oss.str();
+            getResult("update action_count set score=" + sscore + " where src_ip='"+  c[0].as(string()) + "' and host='"+ c[1].as(string()) +"'");
+            cout<<"update action_count set score=" + sscore + " where src_ip='"+  c[0].as(string()) + "' and host='"+ c[1].as(string()) +"'"<<endl;
+            oss.str("");
+            id++;
+         }
+
+/*
          for (size_t i = 0; i < results.size(); ++i) {
             for (size_t j = 0; j < results[i].size(); ++j) {
                const estimate_result& r = results[i][j];
@@ -58,6 +77,7 @@ void UserClassifier::Proc(){
             }
             std::cout << std::endl;
          }
+*/
 
       }else{
          result *result_list;
