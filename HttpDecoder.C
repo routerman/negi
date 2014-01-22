@@ -274,7 +274,7 @@ void HttpDecoder::DecodeGzip(Packet *packet){
 		gzip.dec_init(z);
 	}else if(stream->GetGzipOnlyHttpHeader() == 2){
 		if( stream->GetHttpCompress() == GZIP){
-			cout << "only http header dec gzip-------------" << endl;
+			//cout << "only http header dec gzip-------------" << endl;
 			offset = gzip.dec_gzip(localbuf, p_dec_start, insize, z);
 		}
 	}else if(stream->GetState() == BEGIN){

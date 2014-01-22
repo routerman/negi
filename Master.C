@@ -55,24 +55,36 @@ void Master::Proc(Packet *pkt){
 
 	static time_t prev_time;
 	static time_t now_time;
-
-	if(observer_packet_counter > 20000){
+   static bool measured=false;
+   struct timeval start[4], end[4];
+	if(observer_packet_counter > 10000){
 		now_time = time(NULL);
 		if(now_time > prev_time){
-			cout << now_time - start_time << "	" ;
-			observer->ShowMem(pkt->GetTimestamp()); 
+			//cout << now_time - start_time << "	" ;
+			//observer->ShowMem(pkt->GetTimestamp()); 
 	//		MSG("Packet Count: " << all_packet_counter);
 			observer_packet_counter = 0;
 			prev_time = now_time;
-				
+         
 			MASTER_DEBUG(MSG("uba"));
-			//action_saver->Proc();
+         gettimeofday(&start[0], NULL);
+			   action_saver->Proc();
+         gettimeofday(&end[0], NULL);
+
 			MASTER_DEBUG(MSG("user_classifier"));
-		   //user_classifier->Proc();
+         gettimeofday(&start[1], NULL);
+		      user_classifier->Proc();
+         gettimeofday(&end[1], NULL);
+
 		   MASTER_DEBUG(MSG("user_recommender"));
-			//user_recommender->Proc();
-			//MASTER_DEBUG(MSG("uba->VyattaProc()"));
-			//uba->VyattaProc();	
+         gettimeofday(&start[2], NULL);
+			   user_recommender->Proc();
+         gettimeofday(&end[2], NULL);
+
+         printf("%6d,", (int)(end[0].tv_sec - start[0].tv_sec) * 1000 + (int)(end[0].tv_usec - start[0].tv_usec) / 1000);
+         printf("%6d,", (int)(end[1].tv_sec - start[1].tv_sec) * 1000 + (int)(end[1].tv_usec - start[1].tv_usec) / 1000);
+         printf("%6d\n", (int)(end[2].tv_sec - start[2].tv_sec) * 1000 + (int)(end[2].tv_usec - start[2].tv_usec) / 1000);
+         //NEGI()
 		}
 	}else{
 		observer_packet_counter++;

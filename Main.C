@@ -23,6 +23,7 @@
 
 
 int main(int argc, char *argv[]){
+
 //	signal(SIGINT, signal_handler);
 //
 //Initialize!!
@@ -77,21 +78,12 @@ if(argc != 2){
 	pthread_detach(thread_sss_t);
 	sleep(1);
 */
-
-///*
-	//packetcap();
-
-   action_saver->Proc();
-   user_classifier->Proc();
-   user_recommender->Proc();
-//*/
-
+	packetcap();
 /*
 	//Capture thread
 	pthread_t thread_cap;
 	status=pthread_create(&thread_cap, NULL, thread_packetcap, NULL);
 */
-
     return 0;
 }
 

@@ -1,5 +1,5 @@
 #!/bin/sh
-
+make
 count=`ps -ef | grep jubaclassifier | grep -v grep | wc -l`
 if [ $count = 0 ];
 then

@@ -21,11 +21,11 @@ my $src_ip;
 while ( $src_ip = $sth->fetchrow_array()) {
    print "$src_ip\n";
    system "ip rule add from $src_ip table 100 prio 200";
-   #system "ip route add dev eth0 src $src_ip table 100";
+   system "ip route add dev eth1 src $src_ip table 100";
 }
 die $sth->errstr if $sth->err;
 
 #system "ip route get ADDRESS";
-system "route";
+system "ip rule";
 $sth->finish();
 $dbh->disconnect();

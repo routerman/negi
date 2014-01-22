@@ -53,7 +53,7 @@ ActionSaver::ActionSaver(){
 	for( result::const_iterator c = result_list->begin(); c != result_list->end(); c++ ){
 		tmp_urlaction = new UrlAction( c[0].as(string()), c[1].as(string()), c[2].as(string()) );
 		url_action_list.push_back( *tmp_urlaction );
-		cout<<"host="<< c[0].as(string()) <<": url="<< c[1].as(string()) <<": action="<<  c[2].as(string()) << endl;
+		//cout<<"host="<< c[0].as(string()) <<": url="<< c[1].as(string()) <<": action="<<  c[2].as(string()) << endl;
 	}
 	//tmp = new UrlAction("/gp/product/handle-buy-box/ref","www.amazon.co.jp","cart");
 	//url_action_list.push_back(*tmp);
@@ -85,8 +85,8 @@ void ActionSaver::Proc(){
    bool analyze;
 	string host;
    Entry *entry;
-	RED cout<<"ActionSaver::Proc() start"<<endl; RESET
-	cout  << before_timestamp << endl;
+	//RED cout<<"ActionSaver::Proc() start"<<endl; RESET
+	//cout  << before_timestamp << endl;
 	result *result_list = getResult("select timestamp,src_ip,dst_ip,pattern,result from save_result where timestamp>='"+ before_timestamp +"' and ( pattern='GET ' or pattern='POST ' )");
 	//result *result_list = getResult("select timestamp,src_ip,dst_ip,pattern,result from save_result where ( pattern='GET ' or pattern='POST ' )");
 	//result *result_list = getResult("select src_ip,dst_ip,pattern,result from save_result where timestamp>='"+ before_timestamp +"' and pattern='POST '");
@@ -123,7 +123,7 @@ void ActionSaver::Proc(){
 	//result *tmp = getResult("select CURRENT_TIMESTAMP(0) AT TIME ZONE 'JST'" );
 	//result::const_iterator c = tmp->begin();
 	//before_timestamp = c[0].as( string() );
-	cout << before_timestamp << endl;
+	//cout << before_timestamp << endl;
 	//conn->disconnect();
 	//RED cout<<"ActionSaver::Proc() end" <<endl; RESET
 }
@@ -209,14 +209,14 @@ void ActionSaver::CountTable( Entry *entry ){
 	//}
 	result *res = getResult("select src_ip from action_count where src_ip='"+ entry->src_ip +"' and host='"+ entry->host +"'");
 	if(res->size()==0){
-		RED cout << "INSERT!!" + entry->src_ip << " in host="<< entry->host <<endl; RESET
+		//RED cout << "INSERT!!" + entry->src_ip << " in host="<< entry->host <<endl; RESET
 		getResult("insert into action_count(src_ip,host,access_day,access_month,cart,buy,train_flag) values('"+ entry->src_ip +"','"+ entry->host +"',0,0,0,0,0)" );
 	}
 	//RED cout << "ACCESS!!" + entry->src_ip + " in host=" << entry->host <<endl; RESET
 	//getResult("update action_count set access_day=access_day+1 where src_ip='"+ entry->src_ip +"' and host='"+ entry->host +"'");
 	if( entry->action == "access" )entry->action += "_day";
 	if( entry->action.empty() == false ){
-		RED cout << entry->action << "!! src_ip=" + entry->src_ip +" in host="+ entry->host <<endl; RESET
+		//RED cout << entry->action << "!! src_ip=" + entry->src_ip +" in host="+ entry->host <<endl; RESET
 		getResult("update action_count set " + entry->action + "=" + entry->action + "+1 where src_ip='"+ entry->src_ip + "' and host='"+ entry->host +"'");
 	}
 }
