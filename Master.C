@@ -56,7 +56,7 @@ void Master::Proc(Packet *pkt){
 
 	static time_t prev_time;
 	static time_t now_time;
-	if(observer_packet_counter > 10000){
+	if(observer_packet_counter > 1000000){
 		now_time = time(NULL);
 		if(now_time > prev_time){
 			//cout << now_time - start_time << "	" ;
@@ -83,7 +83,7 @@ void Master::Proc(Packet *pkt){
 
          printf("%6d,", (int)(end[0].tv_sec - start[0].tv_sec) * 1000 + (int)(end[0].tv_usec - start[0].tv_usec) / 1000);
          printf("%6d,", (int)(end[1].tv_sec - start[1].tv_sec) * 1000 + (int)(end[1].tv_usec - start[1].tv_usec) / 1000);
-         printf("%6d", (int)(end[2].tv_sec - start[2].tv_sec) * 1000 + (int)(end[2].tv_usec - start[2].tv_usec) / 1000);
+         printf("%6d,", (int)(end[2].tv_sec - start[2].tv_sec) * 1000 + (int)(end[2].tv_usec - start[2].tv_usec) / 1000);
          printf("%6d\n", (int)(end[3].tv_sec - start[3].tv_sec) * 1000 + (int)(end[3].tv_usec - start[3].tv_usec) / 1000);
          gettimeofday(&start[0], NULL);
          //NEGI()

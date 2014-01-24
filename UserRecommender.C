@@ -85,7 +85,7 @@ void UserRecommender::CompleteScore(){
 
 void UserRecommender::ShowSimilarUser(string src_ip, int size){
    similar_user = jubatus_recommender->similar_row_from_id( src_ip, size);
-   cout<< setw(15)<<src_ip <<",   ";
+   cout<< setw(15)<<src_ip <<"--->";
    for (size_t i = 1; i < similar_user.size(); ++i){
       cout<< setw(15) <<similar_user[i].id<<", ";
    }

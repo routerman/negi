@@ -29,8 +29,9 @@ aptitude install git g++ libboost-dev libpqxx3-dev zlib1g-dev libpcap-dev libboo
 sed -i -e s/ident/trust/ /etc/postgresql/8.4/main/pg_hba.conf
 /etc/init.d/postgresql restart
 
-#sed -i -e s/DBUSERNAME/$DBUSERNAME/ Makefile
-#sed -i -e s/DBNAME/$DBNAME/ Makefile
+cp template/Makefile Makefile
+sed -i -e s/DBUSERNAME/$DBUSERNAME/ Makefile
+sed -i -e s/DBNAME/$DBNAME/ Makefile
 
 psql -U postgres -c "create user $DBUSERNAME"
 psql -U postgres -c "create database $DBNAME"
