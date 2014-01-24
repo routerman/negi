@@ -20,6 +20,7 @@ Master::Master(){
 
 	max_stream_size = 0;
 	start_time = time(NULL);
+   gettimeofday(&start[0], NULL);
 	
 	return;
 }
@@ -55,8 +56,6 @@ void Master::Proc(Packet *pkt){
 
 	static time_t prev_time;
 	static time_t now_time;
-   static bool measured=false;
-   struct timeval start[4], end[4];
 	if(observer_packet_counter > 10000){
 		now_time = time(NULL);
 		if(now_time > prev_time){
@@ -65,25 +64,28 @@ void Master::Proc(Packet *pkt){
 	//		MSG("Packet Count: " << all_packet_counter);
 			observer_packet_counter = 0;
 			prev_time = now_time;
+         gettimeofday(&end[0], NULL);
          
 			MASTER_DEBUG(MSG("uba"));
-         gettimeofday(&start[0], NULL);
-			   action_saver->Proc();
-         gettimeofday(&end[0], NULL);
-
-			MASTER_DEBUG(MSG("user_classifier"));
          gettimeofday(&start[1], NULL);
-		      user_classifier->Proc();
+			   action_saver->Proc();
          gettimeofday(&end[1], NULL);
 
-		   MASTER_DEBUG(MSG("user_recommender"));
+			MASTER_DEBUG(MSG("user_classifier"));
          gettimeofday(&start[2], NULL);
-			   user_recommender->Proc();
+		      user_classifier->Proc();
          gettimeofday(&end[2], NULL);
+
+		   MASTER_DEBUG(MSG("user_recommender"));
+         gettimeofday(&start[3], NULL);
+			   user_recommender->Proc();
+         gettimeofday(&end[3], NULL);
 
          printf("%6d,", (int)(end[0].tv_sec - start[0].tv_sec) * 1000 + (int)(end[0].tv_usec - start[0].tv_usec) / 1000);
          printf("%6d,", (int)(end[1].tv_sec - start[1].tv_sec) * 1000 + (int)(end[1].tv_usec - start[1].tv_usec) / 1000);
-         printf("%6d\n", (int)(end[2].tv_sec - start[2].tv_sec) * 1000 + (int)(end[2].tv_usec - start[2].tv_usec) / 1000);
+         printf("%6d", (int)(end[2].tv_sec - start[2].tv_sec) * 1000 + (int)(end[2].tv_usec - start[2].tv_usec) / 1000);
+         printf("%6d\n", (int)(end[3].tv_sec - start[3].tv_sec) * 1000 + (int)(end[3].tv_usec - start[3].tv_usec) / 1000);
+         gettimeofday(&start[0], NULL);
          //NEGI()
 		}
 	}else{

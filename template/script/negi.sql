@@ -264,10 +264,10 @@ CREATE TABLE record (
 ALTER TABLE public.record OWNER TO postgres;
 
 --
--- Name: url_action_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+-- Name: action_rule_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
-CREATE SEQUENCE url_action_id_seq
+CREATE SEQUENCE action_rule_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -276,14 +276,14 @@ CREATE SEQUENCE url_action_id_seq
     CYCLE;
 
 
-ALTER TABLE public.url_action_id_seq OWNER TO postgres;
+ALTER TABLE public.action_rule_id_seq OWNER TO postgres;
 
 --
--- Name: url_action; Type: TABLE; Schema: public; Owner: postgres; Tablespace:
+-- Name: action_rule; Type: TABLE; Schema: public; Owner: postgres; Tablespace:
 --
 
-CREATE TABLE url_action (
-    id integer DEFAULT nextval('url_action_id_seq'::regclass) NOT NULL,
+CREATE TABLE action_rule(
+    id integer DEFAULT nextval('action_rule_id_seq'::regclass) NOT NULL,
     host text,
     service_type text,
     method text,
@@ -293,7 +293,7 @@ CREATE TABLE url_action (
 	 data text
 );
 
-ALTER TABLE public.url_action OWNER TO postgres;
+ALTER TABLE public.action_rule OWNER TO postgres;
 
 --
 -- Name: action_log_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
@@ -361,7 +361,9 @@ CREATE TABLE action_count(
     buy integer,
     score double precision,
     class text,
-	 train_flag integer
+	 learn_flag integer,
+	 classify_flag integer,
+	 update_flag integer
 );
 
 ALTER TABLE public.action_count OWNER TO postgres;
@@ -425,7 +427,7 @@ GRANT ALL ON SCHEMA public TO PUBLIC;
 COPY rule (id, owner, expire_date, src_ip, src_netmask, src_port, dst_ip, dst_netmask, dst_port, "timestamp", regexp, prefilter_pattern, prefilter_offset, prefilter_depth, save_flag) FROM stdin;
 101	routerman	2012-01-11	\N	\N	\N	\N	\N	\N	2011-01-11 14:40:36.136482	\N	GET 	0	0	1
 102	routerman	2012-09-11	\N	\N	\N	\N	\N	\N	2011-09-11 21:36:39.451221	\N	POST 	0	0	1
-103	routerman	2012-09-11	\N	\N	\N	\N	\N	\N	2011-09-11 21:36:39.451221	\N	HOST:	0	0	1
+103	routerman	2012-09-11	\N	\N	\N	\N	\N	\N	2011-09-11 21:36:39.451221	\N	HOST: 	0	0	1
 104	routerman	2012-09-11	\N	\N	\N	\N	\N	\N	2011-09-11 21:36:39.451221	\N	Cookie:	0	0	1
 105	routerman	2012-09-11	\N	\N	\N	\N	\N	\N	2011-09-11 21:36:39.451221	\N	Referer:	0	0	1
 \.
@@ -451,10 +453,10 @@ COPY record (dst_ip, host) FROM stdin;
 -- Data for Name: rule; Type: TABLE DATA; Schema: public; 
 --
 
-COPY url_action (id, host, method, url, referer, action, data) FROM stdin;
+COPY action_rule (id, host, method, url, referer, action, data) FROM stdin;
 1	www.nitori-net.jp	POST	/shop/cart/cart.aspx	\N	cart	\N
 2	www.amazon.jp	POST	/gp/product/handle-buy-box/ref	\N	cart	\N
-3	www.amazon.jp	POST	'/gp/huc/csrf-add.html/ref'	\N	cart	\N
+3	www.amazon.jp	POST	/gp/huc/csrf-add.html/ref	\N	cart	\N
 \.
 --
 -- Data for Name: rule; Type: TABLE DATA; Schema: public; 

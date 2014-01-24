@@ -47,7 +47,7 @@ make clean && make dep && make
 
 cat << END > ./template/config/pcap.conf
 type pcap
-filename test.pcap
+filename ~/*.pcap
 dbname $DBNAME
 dbuser $DBUSERNAME
 dbpass $DBUSERNAME

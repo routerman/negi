@@ -17,8 +17,14 @@ using namespace jubatus::recommender;
 class UserRecommender{
    bool server_connection;
    jubatus::recommender::client::recommender *jubatus_recommender;
+   vector<id_with_score> similar_user;
+
 public:
    pqxx::result* getResult(string query);
    void Proc();
+   void UpdateRecommender();
+   void CompleteScore();
+   void ShowSimilarUser(string src_ip,int size);
+   void ShowAllSimilarUsers();
    UserRecommender();
 };

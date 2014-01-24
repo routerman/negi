@@ -35,7 +35,7 @@ public:
 };
 
 
-class UrlAction{
+class ActionRule{
 private:
 	string method;
 	string host;
@@ -47,7 +47,7 @@ public:
 	string getHost(){return this->host;}
 	string getUrl(){return this->url;}
 	string getAction(){return this->action;}
-	UrlAction(string host, string url, string action){
+	ActionRule(string host, string url, string action){
 		this->host=host;
 		this->url=url;
 		this->action=action;
@@ -63,20 +63,19 @@ class ActionSaver{
 	map<string,string>::iterator mit;
 
 	string before_timestamp;
-	vector<string> except_extension;
-	vector<UrlAction> url_action_list;
+	vector<string> filter_str_list;
+	vector<ActionRule> action_rule_list;
 public:
 	ActionSaver();
 	void Proc();
 	void Proc( Packet *pkt);
 	//vyatta
 	pqxx::result* getResult(string query);
-	bool extension_filter( string result );
+	bool StringFilter( string result );
 
 	void AnalyzeAction( pqxx::result::const_iterator c, Entry *entry);
 
-	void CountTable( Entry *entry );
-	void LogTable( Entry *entry );
-	void VyattaProc();
+	void SaveActionCountTable( Entry *entry );
+	void SaveActionLogTable( Entry *entry );
 };
 

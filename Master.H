@@ -30,7 +30,7 @@ class Master
 		int observer_packet_counter;
 		long long all_packet_counter;
 		time_t start_time;
-
+      struct timeval start[4], end[4];
 	public:
 		Master();
 		~Master();

@@ -78,7 +78,13 @@ if(argc != 2){
 	pthread_detach(thread_sss_t);
 	sleep(1);
 */
-	packetcap();
+
+   struct timeval s, e;
+   gettimeofday(&s, NULL);
+	   packetcap();
+   gettimeofday(&e, NULL);
+	user_recommender->ShowAllSimilarUsers();
+   printf("%6d\n", (int)(e.tv_sec - s.tv_sec) * 1000 + (int)(e.tv_usec - s.tv_usec) / 1000);
 /*
 	//Capture thread
 	pthread_t thread_cap;
